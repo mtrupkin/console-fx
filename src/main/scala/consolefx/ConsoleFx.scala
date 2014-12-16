@@ -21,13 +21,7 @@ class ConsoleFx(val size: Size) extends Pane with Console {
   val stacks = ofDim[StackPane](size.width, size.height)
   val labels = ofDim[Label](size.width, size.height)
 
-
   size.foreach(init)
-
-  def apply(x: Int, y: Int): Label = labels(x)(y)
-
-  def input(): Option[Input] = ???
-  def render(screen: Screen): Unit = screen.foreach(draw)
 
   def init(x: Int, y: Int): Unit = {
     val s = new StackPane()
@@ -45,6 +39,13 @@ class ConsoleFx(val size: Size) extends Pane with Console {
     s.relocate(px, py)
     getChildren.add(s)
   }
+
+  def apply(x: Int, y: Int): Label = labels(x)(y)
+
+  def input(): Option[Input] = ???
+
+  // draw screen to window
+  def draw(screen: Screen): Unit = screen.foreach(draw)
 
   def draw(x: Int, y: Int, s: ScreenChar): Unit = {
     this(x, y).setText(s)

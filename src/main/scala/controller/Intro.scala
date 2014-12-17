@@ -1,7 +1,8 @@
 package me.mtrupkin.controller
 
 import javafx.event.EventHandler
-import javafx.scene.Parent
+import javafx.fxml.FXMLLoader
+import javafx.scene.{Node, Parent}
 import javafx.scene.control.Label
 import javafx.scene.input.MouseEvent
 
@@ -11,12 +12,10 @@ import javafx.scene.input.MouseEvent
 
 trait Intro { self: Controller =>
   class IntroController extends ControllerState {
-    def root: Parent = {
-      val l = new Label("Hello")
-        l.setOnMouseClicked(new EventHandler[MouseEvent] {
-          override def handle(event: MouseEvent): Unit = changeState(new GameController)
-        })
-        l
+    def root: Node = {
+      val location = getClass.getResource(s"/controller/intro.fxml")
+
+      FXMLLoader.load[Parent](location)
     }
 
     def update(elapsed: Int): Unit = ???

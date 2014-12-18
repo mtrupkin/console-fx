@@ -3,12 +3,8 @@
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
-<?import consolefx.ControlTest?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@Console.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-    <center>
-        <ControlTest></ControlTest>
-    </center>
    <right>
       <GridPane BorderPane.alignment="CENTER">
         <columnConstraints>
@@ -22,11 +18,11 @@
         </rowConstraints>
          <children>
             <Label text="Str" />
-            <Label text="Label" GridPane.columnIndex="1" />
+            <Label id="str" GridPane.columnIndex="1" />
             <Label text="Dex" GridPane.rowIndex="1" />
-            <Label text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label id="dex" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Label text="Int" GridPane.rowIndex="2" />
-            <Label text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label id="int" GridPane.columnIndex="1" GridPane.rowIndex="2" />
          </children>
       </GridPane>
    </right>

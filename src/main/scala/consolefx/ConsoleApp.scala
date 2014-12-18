@@ -4,7 +4,9 @@ import javafx.application.Application
 import javafx.scene.Scene
 import javafx.scene.paint.Color
 import javafx.stage.Stage
+import me.mtrupkin.console.{Size, Screen, Input}
 import me.mtrupkin.controller.Controller
+import me.mtrupkin.game.{ConsoleController, GameEngine}
 
 
 class ConsoleApp extends Application {
@@ -18,6 +20,8 @@ class ConsoleApp extends Application {
     }
 
     Controller.stage.show()
+
+
   }
 }
 

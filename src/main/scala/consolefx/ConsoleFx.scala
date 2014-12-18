@@ -43,7 +43,7 @@ class ConsoleFx(val size: Size) extends Pane with Console {
 
   def apply(x: Int, y: Int): Label = labels(x)(y)
 
-  def input(): Option[Input] = ???
+  def input(): Option[Input] = None
 
   // draw screen to window
   def draw(screen: Screen): Unit = screen.foreach(draw)

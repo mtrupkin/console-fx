@@ -1,13 +1,14 @@
 package me.mtrupkin.controller
 
 import javafx.beans.binding.{Bindings, StringBinding}
+import javafx.fxml.FXML
 import javafx.scene.Parent
 import javafx.scene.control.Label
 import javafx.scene.layout.{VBox, HBox, BorderPane}
 
 import consolefx.ConsoleFx
-import me.mtrupkin.console.Screen
-import me.mtrupkin.game.TileMap
+import me.mtrupkin.console.{Size, Input, Screen}
+import me.mtrupkin.game.{ConsoleController, GameEngine, TileMap}
 import rexpaint.RexPaintImage
 
 /**
@@ -16,6 +17,26 @@ import rexpaint.RexPaintImage
 trait Game { self: Controller =>
   class GameController extends ControllerState {
     val name = "Game"
+
+    @FXML var str: Label = _
+
+    @FXML var dex: Label = _
+
+    @FXML var int: Label = _
+
+    def initialize(): Unit = {
+      println("init")
+      val loop = new GameEngine(new ConsoleController {
+        override def update(elapsed: Int): Unit = update(elapsed)
+        override def handle(input: Input): Unit = {}
+        val screen = Screen(10, 10)
+        override def render: Screen = screen
+      }, new ConsoleFx(Size(10, 10)))
+
+      //loop.gameLoop()
+
+    }
+
 
     def root2: Parent = {
       val levelName = "layers-1"
@@ -45,6 +66,10 @@ trait Game { self: Controller =>
       border
     }
 
-    def update(elapsed: Int): Unit = ???
+    var count = 0
+    def update(elapsed: Int): Unit = {
+      count += elapsed
+      dex.setText(count.toString)
+    }
   }
 }

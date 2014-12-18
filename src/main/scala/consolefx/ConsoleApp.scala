@@ -12,6 +12,7 @@ class ConsoleApp extends Application {
     primaryStage.setTitle("Console FX")
 
     object Controller extends Controller {
+      lazy val css = "/views/Console.css"
       lazy val initialState: ControllerState = new IntroController
       lazy val stage = primaryStage
     }

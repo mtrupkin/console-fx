@@ -27,6 +27,7 @@ class ConsoleFx(val size: Size) extends Pane with Console {
     val s = new StackPane()
     val l = new Label()
 
+
     l.setTextFill(Color.WHITE)
     l.setFont(font)
 

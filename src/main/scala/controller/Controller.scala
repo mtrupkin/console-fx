@@ -2,6 +2,7 @@ package me.mtrupkin.controller
 
 import javafx.animation._
 import javafx.event.{ActionEvent, EventHandler}
+import javafx.fxml.FXMLLoader
 import javafx.scene.layout.StackPane
 import javafx.scene.{Node, Parent, Scene}
 import javafx.stage.Stage
@@ -17,15 +18,29 @@ trait Controller extends StateMachine
   with Game {
   type StateType = ControllerState
 
-  val stage: Stage
+  def stage: Stage
+  def css: String
+
   val stackPane: StackPane = new StackPane
   stackPane.getChildren.add(initialState.root)
+
   val scene = new Scene(stackPane)
+  val cssLocation = getClass.getResource(css).toString
+  scene.getStylesheets.add(cssLocation)
+
   stage.setScene(scene)
 
-
   trait ControllerState extends State {
-    def root: Node
+    def name: String
+    def templateName: String = s"/views/$name.fxml"
+
+    def root: Node = {
+      val is = getClass.getResourceAsStream(templateName)
+      val loader = new FXMLLoader()
+
+      loader.setController(this)
+      loader.load[Parent](is)
+    }
 
     override def onEnter(): Unit = {
       // method A
@@ -39,6 +54,7 @@ trait Controller extends StateMachine
       val previous = stackPane.getChildren.get(0)
       val next = root
       stackPane.getChildren.add(next)
+
       fade(previous, next)
     }
 

@@ -1,5 +1,6 @@
 package me.mtrupkin.controller
 
+import javafx.beans.binding.{Bindings, StringBinding}
 import javafx.scene.Parent
 import javafx.scene.control.Label
 import javafx.scene.layout.{VBox, HBox, BorderPane}
@@ -14,7 +15,9 @@ import rexpaint.RexPaintImage
  */
 trait Game { self: Controller =>
   class GameController extends ControllerState {
-    def root: Parent = {
+    val name = "Game"
+
+    def root2: Parent = {
       val levelName = "layers-1"
       val is = getClass.getResourceAsStream(s"/levels/$levelName.xp")
       val image = RexPaintImage.read(levelName, is)
@@ -41,7 +44,6 @@ trait Game { self: Controller =>
 
       border
     }
-
 
     def update(elapsed: Int): Unit = ???
   }

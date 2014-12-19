@@ -1,12 +1,16 @@
 package me.mtrupkin.game
 
+import javafx.animation.AnimationTimer
+
 import me.mtrupkin.console.Console
 
 
 /**
  * Created by mtrupkin on 12/15/2014.
  */
-class GameEngine(controller: ConsoleController, terminal: Console)  {
+
+
+class GameEngine2(controller: ConsoleController, terminal: Console)  {
   val updatesPerSecond = 100
   val framesPerSecond = 200
 

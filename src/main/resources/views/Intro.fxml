@@ -7,7 +7,8 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="background" stylesheets="@DarkTheme.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" stylesheets="@Console.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <Group BorderPane.alignment="CENTER">
          <children>
@@ -33,7 +34,7 @@
                   </Button>
                   <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleExit" text="Exit">
                      <VBox.margin>
-                        <Insets bottom="20.0" />
+                        <Insets />
                      </VBox.margin>
                   </Button>
                </children>
@@ -49,10 +50,7 @@
       </Label>
    </top>
    <styleClass>
-      <String fx:value="background" />
       <String fx:value="dark" />
+      <String fx:value="background" />
    </styleClass>
-   <bottom>
-      <Label id="testLabel" text="Label" BorderPane.alignment="CENTER" fx:id="testLabel"/>
-   </bottom>
 </BorderPane>

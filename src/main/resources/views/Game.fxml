@@ -1,36 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.canvas.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@Console.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane stylesheets="@Console.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <right>
-      <GridPane BorderPane.alignment="CENTER">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
+      <VBox>
          <children>
-            <Label text="Str" />
-            <Label id="str" GridPane.columnIndex="1" />
-            <Label text="Dex" GridPane.rowIndex="1" />
-            <Label id="dex" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <Label text="Int" GridPane.rowIndex="2" />
-            <Label id="int" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <GridPane alignment="CENTER" hgap="5.0" style="-fx-border-color: white;" styleClass="dark" vgap="5.0" BorderPane.alignment="CENTER">
+              <columnConstraints>
+                <ColumnConstraints halignment="RIGHT" minWidth="10.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                  <RowConstraints vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label text="Strength:" />
+                  <Label fx:id="str" text="00" GridPane.columnIndex="1" />
+                  <Label text="Dexterity:" GridPane.rowIndex="1" />
+                  <Label fx:id="dex" text="00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label text="Intellect:" GridPane.rowIndex="2" />
+                  <Label fx:id="int" text="00" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label text="Hit Points:" GridPane.rowIndex="4" />
+                  <Label text="00" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+               </children>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </GridPane>
+            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: white;" VBox.vgrow="ALWAYS" />
          </children>
-      </GridPane>
+      </VBox>
    </right>
-   <bottom>
-      <TextArea prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-   </bottom>
    <styleClass>
       <String fx:value="dark" />
       <String fx:value="background" />
    </styleClass>
+   <center>
+      <StackPane fx:id="stack" prefHeight="150.0" prefWidth="200.0" style="-fx-border-color: white;" BorderPane.alignment="CENTER" />
+   </center>
+   <bottom>
+      <Label maxWidth="1.7976931348623157E308" style="-fx-border-color: white;" BorderPane.alignment="CENTER" />
+   </bottom>
 </BorderPane>

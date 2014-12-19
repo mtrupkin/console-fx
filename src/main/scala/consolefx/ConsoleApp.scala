@@ -6,7 +6,7 @@ import javafx.scene.paint.Color
 import javafx.stage.Stage
 import me.mtrupkin.console.{Size, Screen, Input}
 import me.mtrupkin.controller.Controller
-import me.mtrupkin.game.{ConsoleController, GameEngine}
+import me.mtrupkin.game.{ConsoleController}
 
 
 class ConsoleApp extends Application {

@@ -1,12 +1,11 @@
 .background {
-    -fx-background-color: #1d1d1d;
+    -fx-background-color: black;
 }
 
-.dark .label {
+.dark > .label  {
     -fx-font-size: 11pt;
     -fx-font-family: "Segoe UI Semibold";
     -fx-text-fill: white;
-    -fx-opacity: 0.6;
 }
 
 /*

@@ -9,6 +9,8 @@ import javafx.stage.Stage
 import javafx.util.Duration
 import me.mtrupkin.game.StateMachine
 
+import scalafx.animation.AnimationTimer
+
 /**
  * Created by mtrupkin on 12/15/2014.
  */
@@ -21,10 +23,10 @@ trait Controller extends StateMachine
   def stage: Stage
   def css: String
 
-  val stackPane: StackPane = new StackPane
-  stackPane.getChildren.add(initialState.root)
+//  val stackPane: StackPane = new StackPane
+//  stackPane.getChildren.add(initialState.root)
 
-  val scene = new Scene(stackPane)
+  val scene = new Scene(initialState.root)
   val cssLocation = getClass.getResource(css).toString
   scene.getStylesheets.add(cssLocation)
 
@@ -34,7 +36,14 @@ trait Controller extends StateMachine
     def name: String
     def templateName: String = s"/views/$name.fxml"
 
-    def root: Node = {
+    val timer = AnimationTimer.apply(handle)
+    var lastPulse: Long = _
+    def handle(now: Long): Unit = {
+      update((now-lastPulse).toInt)
+      lastPulse = now
+    }
+
+    def root: Parent = {
       val is = getClass.getResourceAsStream(templateName)
       val loader = new FXMLLoader()
 
@@ -44,18 +53,18 @@ trait Controller extends StateMachine
 
     override def onEnter(): Unit = {
       // method A
-      //val scene = new Scene(root)
-      //stage.setScene(scene)
+//      val scene = new Scene(root)
+//      stage.setScene(scene)
 
       // method B
-      //scene.setRoot(root)
+      scene.setRoot(root)
 
       // method C
-      val previous = stackPane.getChildren.get(0)
-      val next = root
-      stackPane.getChildren.add(next)
-
-      fade(previous, next)
+//      val previous = stackPane.getChildren.get(0)
+//      val next = root
+//      stackPane.getChildren.add(next)
+//
+//      fade(previous, next)
     }
 
     def fade(previous: Node, next: Node): Unit = {

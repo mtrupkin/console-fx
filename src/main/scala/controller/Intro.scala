@@ -19,16 +19,9 @@ trait Intro { self: Controller =>
 
     def update(elapsed: Int): Unit = ???
 
-    def initialize(): Unit = {
-    }
-
-    @FXML
-    var testLabel: Label = _
-
     def handleNewGame(event: ActionEvent) = changeState(new GameController)
     def handleLoadGame(event: ActionEvent) = {
       println("handled")
-      println(testLabel.getText)
     }
 
     def handleOptions(event: ActionEvent) = println("handled")

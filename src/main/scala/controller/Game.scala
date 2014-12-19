@@ -4,12 +4,14 @@ import javafx.beans.binding.{Bindings, StringBinding}
 import javafx.fxml.FXML
 import javafx.scene.Parent
 import javafx.scene.control.Label
-import javafx.scene.layout.{VBox, HBox, BorderPane}
+import javafx.scene.layout.{StackPane, VBox, HBox, BorderPane}
 
 import consolefx.ConsoleFx
 import me.mtrupkin.console.{Size, Input, Screen}
-import me.mtrupkin.game.{ConsoleController, GameEngine, TileMap}
+import me.mtrupkin.game.{ConsoleController, TileMap}
 import rexpaint.RexPaintImage
+
+import scalafx.animation.AnimationTimer
 
 /**
  * Created by mtrupkin on 12/15/2014.
@@ -19,22 +21,34 @@ trait Game { self: Controller =>
     val name = "Game"
 
     @FXML var str: Label = _
-
     @FXML var dex: Label = _
-
     @FXML var int: Label = _
+    @FXML var stack: StackPane = _
+
+    var tileMap: TileMap = _
+    var console: ConsoleFx = _
+    var screen: Screen = _
 
     def initialize(): Unit = {
       println("init")
-      val loop = new GameEngine(new ConsoleController {
-        override def update(elapsed: Int): Unit = update(elapsed)
-        override def handle(input: Input): Unit = {}
-        val screen = Screen(10, 10)
-        override def render: Screen = screen
-      }, new ConsoleFx(Size(10, 10)))
 
-      //loop.gameLoop()
+      val levelName = "layers-1"
+      val is = getClass.getResourceAsStream(s"/levels/$levelName.xp")
+      val image = RexPaintImage.read(levelName, is)
 
+      tileMap = TileMap.load(image.size, image.layers.head.matrix)
+      console = new ConsoleFx(image.size)
+      screen = Screen(image.size)
+      stack.getChildren.add(console)
+
+      timer.start()
+    }
+
+    def update(elapsed: Int): Unit = {
+//      dex.setText(elapsed.toString)
+
+      tileMap.render(screen)
+      console.draw(screen)
     }
 
 
@@ -45,12 +59,11 @@ trait Game { self: Controller =>
 
       val tileMap = TileMap.load(image.size, image.layers.head.matrix)
       val console = new ConsoleFx(image.size)
-
       val screen = Screen(image.size)
+
       tileMap.render(screen)
       console.draw(screen)
 
-      val pixelSize = console.pixelSize
       val border = new BorderPane()
       border.setLeft(console)
       val masterPane = new HBox()
@@ -64,12 +77,6 @@ trait Game { self: Controller =>
       border.setBottom(statusPane)
 
       border
-    }
-
-    var count = 0
-    def update(elapsed: Int): Unit = {
-      count += elapsed
-      dex.setText(count.toString)
     }
   }
 }

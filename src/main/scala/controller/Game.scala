@@ -4,7 +4,7 @@ import javafx.beans.binding.{Bindings, StringBinding}
 import javafx.fxml.FXML
 import javafx.scene.Parent
 import javafx.scene.control.Label
-import javafx.scene.layout.{StackPane, VBox, HBox, BorderPane}
+import javafx.scene.layout._
 
 import consolefx.ConsoleFx
 import me.mtrupkin.console.{Size, Input, Screen}
@@ -23,7 +23,7 @@ trait Game { self: Controller =>
     @FXML var str: Label = _
     @FXML var dex: Label = _
     @FXML var int: Label = _
-    @FXML var stack: StackPane = _
+    @FXML var pane: Pane = _
 
     var tileMap: TileMap = _
     var console: ConsoleFx = _
@@ -38,8 +38,10 @@ trait Game { self: Controller =>
 
       tileMap = TileMap.load(image.size, image.layers.head.matrix)
       console = new ConsoleFx(image.size)
+      console.setStyle("-fx-border-color: white")
       screen = Screen(image.size)
-      stack.getChildren.add(console)
+      pane.getChildren.clear()
+      pane.getChildren.add(console)
 
       timer.start()
     }

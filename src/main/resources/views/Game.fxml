@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.canvas.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
@@ -7,8 +8,22 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane stylesheets="@Console.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <styleClass>
+      <String fx:value="dark" />
+      <String fx:value="background" />
+   </styleClass>
+   <left>
+      <StackPane fx:id="stack" style="-fx-border-color: white;" BorderPane.alignment="CENTER" />
+   </left>
+   <bottom>
+      <HBox>
+         <children>
+            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: white;" text="Label" BorderPane.alignment="CENTER" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
+         </children>
+      </HBox>
+   </bottom>
    <right>
-      <VBox>
+      <VBox BorderPane.alignment="CENTER">
          <children>
             <GridPane alignment="CENTER" hgap="5.0" style="-fx-border-color: white;" styleClass="dark" vgap="5.0" BorderPane.alignment="CENTER">
               <columnConstraints>
@@ -39,18 +54,8 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </GridPane>
-            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: white;" VBox.vgrow="ALWAYS" />
+            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: white;" VBox.vgrow="SOMETIMES" />
          </children>
       </VBox>
    </right>
-   <styleClass>
-      <String fx:value="dark" />
-      <String fx:value="background" />
-   </styleClass>
-   <center>
-      <StackPane fx:id="stack" prefHeight="150.0" prefWidth="200.0" style="-fx-border-color: white;" BorderPane.alignment="CENTER" />
-   </center>
-   <bottom>
-      <Label maxWidth="1.7976931348623157E308" style="-fx-border-color: white;" BorderPane.alignment="CENTER" />
-   </bottom>
 </BorderPane>

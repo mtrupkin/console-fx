@@ -42,20 +42,21 @@ class RexPaintStream(is: InputStream) {
   def readInt(): Int = java.lang.Integer.reverseBytes(dataInputStream.readInt())
 }
 
-case class RexPaintLayer(matrix: Seq[Seq[ScreenChar]])
+case class RexPaintLayer(size: Size, matrix: Seq[Seq[ScreenChar]])
 
 object RexPaintLayer {
   def readRGB(is: RexPaintStream): RGB = RGB(is.readByte() & 0xff, is.readByte() & 0xff, is.readByte() & 0xff)
   def readScreenChar(is: RexPaintStream): ScreenChar = ScreenChar(ExtendedAscii.toUnicode(is.readInt().toChar), readRGB(is), readRGB(is))
 
-  def read(is: RexPaintStream, width: Int, height: Int): RexPaintLayer = {
+  def read(is: RexPaintStream): RexPaintLayer = {
+    val size = Size(is.readInt(), is.readInt())
     val m = for {
-      i <- 0 until width
+      i <- 0 until size.width
     } yield for {
-        j <- 0 until height
+        j <- 0 until size.height
       } yield readScreenChar(is)
 
-    RexPaintLayer(m)
+    RexPaintLayer(size, m)
   }
 }
 
@@ -69,14 +70,13 @@ object RexPaintImage {
 
     val version = dataInput.readInt()
     val layerCount = dataInput.readInt()
-    val size = Size(dataInput.readInt(), dataInput.readInt())
 
     val layers = for {
       i <- 0 until layerCount
-    } yield RexPaintLayer.read(dataInput, size.width, size.height)
+    } yield RexPaintLayer.read(dataInput)
 
     gzipInput.close()
 
-    RexPaintImage(name, size, layers)
+    RexPaintImage(name, layers.head.size, layers)
   }
 }

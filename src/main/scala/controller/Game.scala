@@ -8,6 +8,7 @@ import javafx.scene.layout._
 
 import consolefx.ConsoleFx
 import me.mtrupkin.console.{Size, Input, Screen}
+import me.mtrupkin.game.model.World
 import me.mtrupkin.game.{ConsoleController, TileMap}
 import rexpaint.RexPaintImage
 
@@ -17,7 +18,7 @@ import scalafx.animation.AnimationTimer
  * Created by mtrupkin on 12/15/2014.
  */
 trait Game { self: Controller =>
-  class GameController extends ControllerState {
+  class GameController(val world: World) extends ControllerState {
     val name = "Game"
 
     @FXML var str: Label = _
@@ -25,21 +26,15 @@ trait Game { self: Controller =>
     @FXML var int: Label = _
     @FXML var pane: Pane = _
 
-    var tileMap: TileMap = _
     var console: ConsoleFx = _
     var screen: Screen = _
 
     def initialize(): Unit = {
       println("init")
 
-      val levelName = "layers-1"
-      val is = getClass.getResourceAsStream(s"/levels/$levelName.xp")
-      val image = RexPaintImage.read(levelName, is)
-
-      tileMap = TileMap.load(image.size, image.layers.head.matrix)
-      console = new ConsoleFx(image.size)
+      console = new ConsoleFx(world.tileMap.size)
       console.setStyle("-fx-border-color: white")
-      screen = Screen(image.size)
+      screen = Screen(world.tileMap.size)
       pane.getChildren.clear()
       pane.getChildren.add(console)
 
@@ -47,38 +42,13 @@ trait Game { self: Controller =>
     }
 
     def update(elapsed: Int): Unit = {
-//      dex.setText(elapsed.toString)
+      import world.player._
+      str.setText(stats.str.toString)
+      dex.setText(stats.dex.toString)
+      int.setText(stats.int.toString)
 
-      tileMap.render(screen)
+      world.render(screen)
       console.draw(screen)
-    }
-
-
-    def root2: Parent = {
-      val levelName = "layers-1"
-      val is = getClass.getResourceAsStream(s"/levels/$levelName.xp")
-      val image = RexPaintImage.read(levelName, is)
-
-      val tileMap = TileMap.load(image.size, image.layers.head.matrix)
-      val console = new ConsoleFx(image.size)
-      val screen = Screen(image.size)
-
-      tileMap.render(screen)
-      console.draw(screen)
-
-      val border = new BorderPane()
-      border.setLeft(console)
-      val masterPane = new HBox()
-      val l = new Label("Hello")
-      masterPane.getChildren.addAll(l)
-      border.setCenter(masterPane)
-
-      val statusPane = new VBox()
-      val l2 = new Label("Hello")
-      statusPane.getChildren.addAll(l2)
-      border.setBottom(statusPane)
-
-      border
     }
   }
 }

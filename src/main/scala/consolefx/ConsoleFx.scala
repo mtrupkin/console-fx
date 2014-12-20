@@ -20,9 +20,9 @@ class ConsoleFx(val size: Size) extends Pane with Console {
   val charBounds = ConsoleFx.charBounds(font)
   val stacks = ofDim[StackPane](size.width, size.height)
   val labels = ofDim[Label](size.width, size.height)
-  val (prefWidth, prefHeight) = toPixel(size)
-  setPrefSize(prefWidth, prefHeight)
-  setMinSize(prefWidth, prefHeight)
+  val (conWidth, conHeight) = toPixel(size)
+  setPrefSize(conWidth, conHeight)
+  setMinSize(conWidth, conHeight)
 
   size.foreach(init)
 

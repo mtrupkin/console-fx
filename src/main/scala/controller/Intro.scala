@@ -4,7 +4,10 @@ import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.control.Label
 
-
+import me.mtrupkin.console.Point
+import me.mtrupkin.game.TileMap
+import me.mtrupkin.game.model.{Encounter, Stats, Agent, World}
+import rexpaint.RexPaintImage
 
 
 /**
@@ -19,7 +22,22 @@ trait Intro { self: Controller =>
 
     def update(elapsed: Int): Unit = ???
 
-    def handleNewGame(event: ActionEvent) = changeState(new GameController)
+    def handleNewGame(event: ActionEvent) = {
+      val levelName = "layers-1"
+      val is = getClass.getResourceAsStream(s"/levels/$levelName.xp")
+      val image = RexPaintImage.read(levelName, is)
+
+      val tileMap = TileMap.load(image.size, image.layers.head.matrix)
+
+      val player = new Agent("Player", '@', Point(5, 5), Stats(str = 1))
+      val world = new World(player, tileMap)
+
+      val agents = Encounter.toAgents(image.layers(1).matrix)
+
+      world.encounter = new Encounter(world, agents)
+
+      changeState(new GameController(world))
+    }
     def handleLoadGame(event: ActionEvent) = {
       println("handled")
     }

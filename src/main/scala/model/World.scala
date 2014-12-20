@@ -1,6 +1,6 @@
 package me.mtrupkin.game.model
 
-import me.mtrupkin.console.Screen
+import me.mtrupkin.console.{Point, Screen}
 import me.mtrupkin.game.TileMap
 
 
@@ -13,6 +13,7 @@ class World (
   var time: Long = 0) {
 
   var encounter: Encounter = _
+
   def update(elapsed: Int) {
     time += elapsed
   }
@@ -30,6 +31,30 @@ class World (
     for (a <- encounter.activeAgents) {
       renderAgent(screen, a)
     }
+  }
 
+  def act(direction: Point): Boolean = {
+    val action = tryAct(direction)
+    if (action) {
+      encounter.nextTurn()
+    }
+
+    action
+  }
+  def tryAct(direction: Point): Boolean = {
+    val p = player.position + direction
+    for (a <- encounter.activeAgents.find(a => a.position == p) ) {
+      attack(a)
+      return true
+    }
+
+    if (tileMap.move(p.x, p.y)) {
+      player.move(direction)
+      true
+    } else false
+  }
+
+  def attack(a: Agent): Unit = {
+    Combat.attack(player.melee, a)
   }
 }

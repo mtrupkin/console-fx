@@ -27,8 +27,8 @@ object Combat {
     damage
   }
 
-  def attackRanged(attacker: Agent, defender: Entity): Unit = {
-    val damage = attack(attacker.ranged, defender.defense)
+  def attack(attackType: Combat, defender: Entity): Unit = {
+    val damage = attack(attackType, defender.defense)
     defender.takeDamage(damage)
   }
 }

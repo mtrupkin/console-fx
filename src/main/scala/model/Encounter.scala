@@ -35,7 +35,9 @@ class Encounter(val world: World, val agents: Seq[Agent]) {
 object Encounter {
   def toAgent(sc: ScreenChar, p: Point): Option[Agent] = {
     sc.c match {
-      case 'T' => Some(new Agent("turret", 'T', p))
+      case 'T' => Some(new Agent("turret", 'T', p) {
+        def act(world: World): Unit = Combat.attack(ranged, world.player)
+      })
       case _ => None
     }
   }

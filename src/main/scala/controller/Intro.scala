@@ -29,7 +29,9 @@ trait Intro { self: Controller =>
 
       val tileMap = TileMap.load(image.size, image.layers.head.matrix)
 
-      val player = new Agent("Player", '@', Point(5, 5), Stats(str = 1))
+      val player = new Agent("Player", '@', Point(5, 5), Stats(str = 1)) {
+        override def act(world: World): Unit = ???
+      }
       val world = new World(player, tileMap)
 
       val agents = Encounter.toAgents(image.layers(1).matrix)

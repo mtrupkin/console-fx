@@ -29,7 +29,6 @@ trait Controller extends StateMachine
   val scene = new Scene(initialState.root)
   val cssLocation = getClass.getResource(css).toString
   scene.getStylesheets.add(cssLocation)
-
   stage.setScene(scene)
 
   trait ControllerState extends State {

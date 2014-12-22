@@ -7,6 +7,7 @@ import javafx.scene.control.Label
 import me.mtrupkin.console.Point
 import me.mtrupkin.game.TileMap
 import me.mtrupkin.game.model.{Encounter, Stats, Agent, World}
+import org.apache.commons.lang3.time.StopWatch
 import rexpaint.RexPaintImage
 
 
@@ -30,14 +31,13 @@ trait Intro { self: Controller =>
       val tileMap = TileMap.load(image.size, image.layers.head.matrix)
 
       val player = new Agent("Player", '@', Point(5, 5), Stats(str = 1)) {
-        override def act(world: World): Unit = ???
+        def act(world: World): Unit = ???
       }
       val world = new World(player, tileMap)
 
       val agents = Encounter.toAgents(image.layers(1).matrix)
 
       world.encounter = new Encounter(world, agents)
-
       changeState(new GameController(world))
     }
     def handleLoadGame(event: ActionEvent) = {

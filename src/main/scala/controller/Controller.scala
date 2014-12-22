@@ -1,15 +1,21 @@
 package me.mtrupkin.controller
 
+import java.util.function.Consumer
 import javafx.animation._
+import javafx.application.Platform
 import javafx.event.{ActionEvent, EventHandler}
-import javafx.fxml.FXMLLoader
+import javafx.fxml.{FXML, FXMLLoader}
+import javafx.scene.control.Label
 import javafx.scene.layout.StackPane
 import javafx.scene.{Node, Parent, Scene}
 import javafx.stage.Stage
 import javafx.util.Duration
+import com.sun.javafx.tk.Toolkit.Task
 import me.mtrupkin.game.StateMachine
+import org.apache.commons.lang3.time.StopWatch
 
 import scalafx.animation.AnimationTimer
+
 
 /**
  * Created by mtrupkin on 12/15/2014.
@@ -23,10 +29,10 @@ trait Controller extends StateMachine
   def stage: Stage
   def css: String
 
-//  val stackPane: StackPane = new StackPane
-//  stackPane.getChildren.add(initialState.root)
-
+  val viewStack = new StackPane()
+  viewStack.getChildren.add(new Label("Loading"))
   val scene = new Scene(initialState.root)
+
   val cssLocation = getClass.getResource(css).toString
   scene.getStylesheets.add(cssLocation)
   stage.setScene(scene)
@@ -42,28 +48,41 @@ trait Controller extends StateMachine
       lastPulse = now
     }
 
+
     def root: Parent = {
       val is = getClass.getResourceAsStream(templateName)
       val loader = new FXMLLoader()
-
       loader.setController(this)
       loader.load[Parent](is)
     }
 
+
     override def onEnter(): Unit = {
+      val sw = new StopWatch
+      sw.start()
       // method A
 //      val scene = new Scene(root)
 //      stage.setScene(scene)
 
       // method B
-      scene.setRoot(root)
+      val newRoot = root
+      sw.stop
+      println(s"newRoot: ${sw.getTime}")
+      sw.reset()
+      sw.start()
+      Platform.runLater(new Runnable {
+        override def run(): Unit = scene.setRoot(newRoot)
+      })
+        //() => scene.setRoot(newRoot))
+      //scene.setRoot(newRoot)
+      sw.stop
+      println(s"setRoot: ${sw.getTime}")
 
       // method C
-//      val previous = stackPane.getChildren.get(0)
-//      val next = root
-//      stackPane.getChildren.add(next)
-//
-//      fade(previous, next)
+//      viewStack.getChildren.clear()
+//      viewStack.getChildren.add(root)
+
+
     }
 
     def fade(previous: Node, next: Node): Unit = {

@@ -1,5 +1,6 @@
 package me.mtrupkin.controller
 
+import java.util.concurrent.Executor
 import java.util.function.Consumer
 import javafx.animation._
 import javafx.application.Platform
@@ -58,25 +59,25 @@ trait Controller extends StateMachine
 
 
     override def onEnter(): Unit = {
-      val sw = new StopWatch
-      sw.start()
+
       // method A
 //      val scene = new Scene(root)
 //      stage.setScene(scene)
 
       // method B
-      val newRoot = root
-      sw.stop
-      println(s"newRoot: ${sw.getTime}")
-      sw.reset()
-      sw.start()
-      Platform.runLater(new Runnable {
-        override def run(): Unit = scene.setRoot(newRoot)
+      val t = new Thread(new Runnable {
+        override def run(): Unit = {
+          val newRoot = root
+          Platform.runLater(new Runnable {
+            override def run(): Unit = scene.setRoot(newRoot)
+          })
+
+        }
       })
+
+      t.run()
         //() => scene.setRoot(newRoot))
       //scene.setRoot(newRoot)
-      sw.stop
-      println(s"setRoot: ${sw.getTime}")
 
       // method C
 //      viewStack.getChildren.clear()

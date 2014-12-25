@@ -3,14 +3,14 @@ package me.mtrupkin.controller
 
 import javafx.event.EventHandler
 import javafx.fxml.FXML
-import javafx.scene.control.Label
+import javafx.scene.control.{TableView, Label}
 import javafx.scene.input.KeyEvent
 import javafx.scene.layout._
 
 import consolefx.ConsoleFx
 import me.mtrupkin.console._
-import me.mtrupkin.game.model.World
-import org.apache.commons.lang3.time.StopWatch
+import me.mtrupkin.game.model.{Entity, Agent, World}
+
 
 /**
  * Created by mtrupkin on 12/15/2014.
@@ -19,6 +19,7 @@ trait Game { self: Controller =>
   class GameController(val world: World) extends ControllerState {
     val name = "Game"
 
+    @FXML var encounterTable: TableView[Entity] = _
     @FXML var strText: Label = _
     @FXML var dexText: Label = _
     @FXML var intText: Label = _

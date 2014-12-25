@@ -5,10 +5,7 @@ import scala.util.Random
 /**
  * Created by mtrupkin on 12/19/2014.
  */
-object Die {
-  // 3d6
-  def apply(): Int = this(3, 6)
-
+object Dice {
   // roll one x sided die
   def apply(sides: Int): Int = Random.nextInt(sides) + 1
 

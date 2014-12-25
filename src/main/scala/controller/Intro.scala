@@ -7,7 +7,6 @@ import javafx.scene.control.Label
 import me.mtrupkin.console.Point
 import me.mtrupkin.game.TileMap
 import me.mtrupkin.game.model.{Encounter, Stats, Agent, World}
-import org.apache.commons.lang3.time.StopWatch
 import rexpaint.RexPaintImage
 
 

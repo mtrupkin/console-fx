@@ -11,9 +11,7 @@ import javafx.scene.layout.StackPane
 import javafx.scene.{Node, Parent, Scene}
 import javafx.stage.Stage
 import javafx.util.Duration
-import com.sun.javafx.tk.Toolkit.Task
 import me.mtrupkin.game.StateMachine
-import org.apache.commons.lang3.time.StopWatch
 
 import scalafx.animation.AnimationTimer
 

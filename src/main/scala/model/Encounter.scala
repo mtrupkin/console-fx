@@ -16,20 +16,10 @@ class Encounter(val world: World, val agents: Seq[Agent]) {
       agent.act(world)
     }
     round += 1
-    println
   }
 
   def activeAgents: Seq[Agent] = agents.filter(a => a.hp >= 0)
 
-  def simulate(): Unit = {
-    do {
-      nextTurn()
-    } while (player.hp >= 0)
-    println(s"death in $round rounds")
-
-    round = 0
-    player.hp = player.maxHP
-  }
 }
 
 object Encounter {

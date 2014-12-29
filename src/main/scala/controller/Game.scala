@@ -83,9 +83,10 @@ trait Game { self: Controller =>
 //      nameCol.setCellValueFactory(new PropertyValueFactory[AgentBean, String]("name"))
 //      val nameCol2 = new control.TableColumn[AgentBean, String](nameCol)
       val beans: Seq[AgentBean] = world.encounter.activeAgents.map(a => new AgentBean(a))
-      val agentModel: ObservableBuffer[AgentBean] = scalafx.collections.ObservableBuffer[AgentBean](beans)
+//      agentModel = scalafx.collections.ObservableBuffer[AgentBean](beans)
       import scalafx.scene.control.TableColumn._
-      val content: TableView[AgentBean] = new TableView[AgentBean](agentModel) {
+      agentModel ++= beans
+      content = new TableView[AgentBean](agentModel) {
         columns ++= List(
           new TableColumn[AgentBean, String] {
             text = "First Name"
@@ -108,6 +109,9 @@ trait Game { self: Controller =>
       timer.start()
     }
 
+    val agentModel: ObservableBuffer[AgentBean] = scalafx.collections.ObservableBuffer[AgentBean]()
+    var content: TableView[AgentBean] = _
+
     def keyCodeToConsoleKey(event: KeyEvent): ConsoleKey = {
       val modifier = Modifier(event.isShiftDown, event.isControlDown, event.isAltDown)
       val jfxName = event.getCode.getName
@@ -124,7 +128,12 @@ trait Game { self: Controller =>
       intText.setText(stats.int)
       hpText.setText(hp)
 
+
+      val beans: Seq[AgentBean] = world.encounter.activeAgents.map(a => new AgentBean(a))
+//      agentModel.filter()
+      content.items = scalafx.collections.ObservableBuffer[AgentBean](beans)
       world.render(screen)
+
       console.draw(screen)
     }
   }

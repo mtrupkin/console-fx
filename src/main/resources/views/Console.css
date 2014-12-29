@@ -64,10 +64,13 @@
     -fx-background-color: transparent;
 }
 
+.table-view {
+    -fx-base: #1d1d1d;
+    -fx-control-inner-background: #1d1d1d;
+}
+
 .dark .table-view .label {
     -fx-background-color: transparent;
-    /*-fx-font-size: 9pt;*/
-    /*-fx-font-family: "Segoe UI Light";*/
 }
 
 .table-view .column-header {

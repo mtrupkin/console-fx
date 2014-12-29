@@ -14,7 +14,7 @@ libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.0-M2"
 
 libraryDependencies += "me.mtrupkin.console" %% "console-core" % "0.5-SNAPSHOT"
 
-libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.0-R4"
+libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.20-R6"
 
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
 

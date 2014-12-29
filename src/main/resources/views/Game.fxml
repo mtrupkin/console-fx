@@ -46,12 +46,8 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </GridPane>
-            <TableView fx:id="encounterTable" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: white;">
-              <columns>
-                <TableColumn editable="false" maxWidth="1.7976931348623157E308" prefWidth="200.0" sortable="false" text="Name" />
-                <TableColumn editable="false" maxWidth="-1.0" minWidth="100.0" prefWidth="-1.0" sortable="false" text="Hit Points" />
-              </columns>
-            </TableView>
+            <Pane fx:id="tablePane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: white;" styleClass="dark-background" />
+            <!--<Pane fx:id="tablePane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="550.0" prefWidth="500.0" style="-fx-border-color: white;" styleClass="dark-background" />-->
          </children>
       </VBox>
       <Label alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: white;" styleClass="dark" text="Label" GridPane.columnSpan="2" GridPane.rowIndex="1" />

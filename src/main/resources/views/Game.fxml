@@ -46,7 +46,12 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </GridPane>
-            <Pane fx:id="tablePane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: white;" styleClass="dark-background" />
+            <TableView fx:id="agentTbl" focusTraversable="false" maxHeight="1.7976931348623157E308" prefWidth="200.0">
+              <columns>
+                <TableColumn fx:id="nameCol" minWidth="-1.0" prefWidth="200.0" text="Name" />
+                <TableColumn fx:id="hpCol" prefWidth="75.0" text="HP" />
+              </columns>
+            </TableView>
             <!--<Pane fx:id="tablePane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="550.0" prefWidth="500.0" style="-fx-border-color: white;" styleClass="dark-background" />-->
          </children>
       </VBox>

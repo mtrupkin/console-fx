@@ -65,8 +65,9 @@
 }
 
 .table-view {
-    -fx-base: #1d1d1d;
-    -fx-control-inner-background: #1d1d1d;
+    -fx-base: black;
+    -fx-control-inner-background: black;
+    -fx-table-cell-border-color: transparent;
 }
 
 .dark .table-view .label {
@@ -79,7 +80,7 @@
     -fx-border-color:
     transparent
     transparent
-    derive(-fx-base, 80%)
+    white
     transparent;
     -fx-border-insets: 0 10 1 0;
 }

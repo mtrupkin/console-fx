@@ -39,12 +39,9 @@ trait Intro { self: Controller =>
       world.encounter = new Encounter(world, agents)
       changeState(new GameController(world))
     }
-    def handleLoadGame(event: ActionEvent) = {
-      println("handled")
-    }
-
+    def handleLoadGame(event: ActionEvent) = println("handled")
     def handleOptions(event: ActionEvent) = println("handled")
-    def handleExit(event: ActionEvent) = println("handled")
+    def handleExit(event: ActionEvent) = stage.close()
   }
 
 }

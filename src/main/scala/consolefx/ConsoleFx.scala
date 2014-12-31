@@ -16,13 +16,16 @@ import Math._
  */
 class ConsoleFx(val size: Size) extends Pane with Console {
   setStyle("-fx-background-color: black;")
+  val offsetX, offsetY = 1
+
   val font = Font.font("Consolas", FontWeight.NORMAL, 19)
   val charBounds = ConsoleFx.charBounds(font)
   val stacks = ofDim[StackPane](size.width, size.height)
   val labels = ofDim[Label](size.width, size.height)
   val (conWidth, conHeight) = toPixel(size)
-  setPrefSize(conWidth, conHeight)
-  setMinSize(conWidth, conHeight)
+  val (sizeX, sizeY) = (conWidth + offsetX * 2, conHeight + offsetY * 2)
+  setPrefSize(sizeX, sizeY)
+  setMinSize(sizeX, sizeY)
 
   size.foreach(init)
 
@@ -59,23 +62,26 @@ class ConsoleFx(val size: Size) extends Pane with Console {
     val (x, y) = p
     val (width, height) = charBounds
 
-    (x * width, y * height)
+    (x * width + offsetX, y * height + offsetY)
   }
 
-  def toScreen(p: (Double, Double)): (Int, Int) = {
-    val (x, y) = p
+  def floor(d: Double): Int = Math.floor(d).toInt
+
+  def toScreen(x: Double, y: Double): Option[(Int, Int)] = {
     val (width, height) = charBounds
-
-    (floor(x / width).toInt, floor(y / height).toInt)
+    val c = (floor((x-offsetX) / width), floor((y-offsetY) / height))
+    if (size.inBounds(c)) Some(c) else None
   }
 
-  def pixelSize(): Size = toPixel(size)
+//  def pixelSize(): Size = toPixel(size)
 }
 
 object ConsoleFx {
   def charBounds(f: Font): (Double, Double) = {
-    val metrics = com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().getFontMetrics(f)
-    val fontWidth = com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().computeStringWidth(" ", f)
+    val fl = com.sun.javafx.tk.Toolkit.getToolkit.getFontLoader
+
+    val metrics = fl.getFontMetrics(f)
+    val fontWidth = fl.computeStringWidth(" ", f)
     (floor(fontWidth), floor(metrics.getLineHeight))
   }
 }

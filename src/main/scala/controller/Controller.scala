@@ -8,7 +8,6 @@ import javafx.scene.layout.StackPane
 import javafx.scene.{Node, Parent, Scene}
 import javafx.stage.Stage
 import javafx.util.Duration
-import me.mtrupkin.controller.game.Game
 import me.mtrupkin.game.StateMachine
 
 import scalafx.animation.AnimationTimer

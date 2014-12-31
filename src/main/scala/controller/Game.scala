@@ -1,19 +1,19 @@
-package me.mtrupkin.controller.game
+package me.mtrupkin.controller
 
 import javafx.collections.FXCollections._
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.scene.control.{Label, TableColumn, TableView}
-import javafx.scene.input.{MouseEvent, KeyEvent}
+import javafx.scene.input.{KeyEvent, MouseEvent}
 import javafx.scene.layout.Pane
 
 import consolefx.ConsoleFx
 import me.mtrupkin.console._
-import me.mtrupkin.controller.Controller
+import me.mtrupkin.controller.game.{AgentBean, KeyHandler}
 import me.mtrupkin.game.model.World
 
-import scalafx.scene.{control => sfxc}
 import scala.collection.JavaConversions._
+import scalafx.scene.{control => sfxc}
 
 
 /**
@@ -31,9 +31,11 @@ trait Game { self: Controller =>
     @FXML var strText: Label = _
     @FXML var dexText: Label = _
     @FXML var intText: Label = _
+    @FXML var moveText: Label = _
     @FXML var hpText: Label = _
     @FXML var infoText: Label = _
     @FXML var infoDescText: Label = _
+    @FXML var infoPosText: Label = _
     @FXML var pane: Pane = _
 
     var console: ConsoleFx = _
@@ -43,7 +45,11 @@ trait Game { self: Controller =>
       console = new ConsoleFx(world.tileMap.size)
       console.setStyle("-fx-border-color: white")
       console.setOnMouseMoved(new EventHandler[MouseEvent] {
-        override def handle(event: MouseEvent): Unit = handleMouse(event)
+        override def handle(event: MouseEvent): Unit = handleMouseMove(event)
+      } )
+
+      console.setOnMouseExited(new EventHandler[MouseEvent] {
+        override def handle(event: MouseEvent): Unit = handleMouseExit(event)
       } )
 
       screen = Screen(world.tileMap.size)
@@ -73,35 +79,40 @@ trait Game { self: Controller =>
       strText.setText(stats.str)
       dexText.setText(stats.dex)
       intText.setText(stats.int)
+      moveText.setText(move)
       hpText.setText(hp)
 
       world.render(screen)
       console.draw(screen)
     }
 
+    implicit def pointToString(p: Point): String = {
+      s"[${p.x}, ${p.y}]"
+    }
 
-    def handleMouse(mouseEvent: MouseEvent): Unit = {
-      val (px, py) = (mouseEvent.getX, mouseEvent.getY)
-      println(s"mouse moved $px $py")
+    def handleMouseMove(mouseEvent: MouseEvent): Unit = {
+      val (x, y) = (mouseEvent.getX, mouseEvent.getY)
+      for( s <- console.toScreen(x, y)) {
+        val p: Point = s
+        infoPosText.setText(p)
 
-      val p = Point.TupleToPoint(console.toScreen(px, py))
-      println(s"mouse moved $p")
-      val target = world.encounter.activeAgents.find(a => a.position == p )
-      target match {
-        case Some(t) => {
-          infoText.setText(t.name)
-          infoDescText.setText(t.hp)
-        }
-        case None => {
-          infoText.setText(p.toString)
-          infoDescText.setText("")
+        val target = world.encounter.activeAgents.find(a => a.position == p)
+        target match {
+          case Some(t) => {
+            infoText.setText(t.name)
+            infoDescText.setText(t.hp)
+          }
+          case None => {
+            infoText.setText(world.tileMap(p).name)
+          }
         }
       }
-      for (t <- target) {
-        infoText.setText(t.name)
-        infoDescText.setText(t.hp)
-      }
-      world.tileMap(p.x, p.y)
+    }
+
+    def handleMouseExit(mouseEvent: MouseEvent): Unit = {
+      infoText.setText("")
+      infoDescText.setText("")
+      infoPosText.setText("")
     }
 
     override def handle(event: KeyEvent): Unit = {

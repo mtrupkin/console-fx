@@ -1,16 +1,14 @@
 package me.mtrupkin.controller
 
-import java.util.concurrent.Executor
-import java.util.function.Consumer
 import javafx.animation._
 import javafx.application.Platform
-import javafx.event.{ActionEvent, EventHandler}
-import javafx.fxml.{FXML, FXMLLoader}
+import javafx.fxml.FXMLLoader
 import javafx.scene.control.Label
 import javafx.scene.layout.StackPane
 import javafx.scene.{Node, Parent, Scene}
 import javafx.stage.Stage
 import javafx.util.Duration
+import me.mtrupkin.controller.game.Game
 import me.mtrupkin.game.StateMachine
 
 import scalafx.animation.AnimationTimer
@@ -42,11 +40,11 @@ trait Controller extends StateMachine
 
     val timer = AnimationTimer.apply(handle)
     var lastPulse: Long = _
+
     def handle(now: Long): Unit = {
       update((now-lastPulse).toInt)
       lastPulse = now
     }
-
 
     def root: Parent = {
       val is = getClass.getResourceAsStream(templateName)
@@ -55,14 +53,7 @@ trait Controller extends StateMachine
       loader.load[Parent](is)
     }
 
-
     override def onEnter(): Unit = {
-
-      // method A
-//      val scene = new Scene(root)
-//      stage.setScene(scene)
-
-      // method B
       val t = new Thread(new Runnable {
         override def run(): Unit = {
           val newRoot = root
@@ -74,14 +65,6 @@ trait Controller extends StateMachine
       })
 
       t.run()
-        //() => scene.setRoot(newRoot))
-      //scene.setRoot(newRoot)
-
-      // method C
-//      viewStack.getChildren.clear()
-//      viewStack.getChildren.add(root)
-
-
     }
 
     def fade(previous: Node, next: Node): Unit = {
@@ -98,7 +81,6 @@ trait Controller extends StateMachine
       fadeNext.setCycleCount(Animation.INDEFINITE)
       fadeNext.setAutoReverse(true)
       fadeNext.play()
-
     }
   }
 }

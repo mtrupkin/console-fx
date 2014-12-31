@@ -62,6 +62,13 @@ class ConsoleFx(val size: Size) extends Pane with Console {
     (x * width, y * height)
   }
 
+  def toScreen(p: (Double, Double)): (Int, Int) = {
+    val (x, y) = p
+    val (width, height) = charBounds
+
+    (floor(x / width).toInt, floor(y / height).toInt)
+  }
+
   def pixelSize(): Size = toPixel(size)
 }
 

@@ -12,7 +12,7 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.6" % "test"
 
 libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.0-M2"
 
-libraryDependencies += "me.mtrupkin.console" %% "console-core" % "0.5-SNAPSHOT"
+libraryDependencies += "me.mtrupkin.console" %% "console-core" % "0.5"
 
 libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.20-R6"
 

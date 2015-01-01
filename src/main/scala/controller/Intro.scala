@@ -1,14 +1,11 @@
 package me.mtrupkin.controller
 
 import javafx.event.ActionEvent
-import javafx.fxml.FXML
-import javafx.scene.control.Label
 
-import me.mtrupkin.console.Point
-import me.mtrupkin.game.TileMap
-import me.mtrupkin.game.model.{Encounter, Stats, Agent, World}
+import me.mtrupkin.game.model.{Stats, Agent, World}
+import me.mtrupkin.game.model.TileMap
 import rexpaint.RexPaintImage
-
+import me.mtrupkin.core.{Point, Size}
 
 /**
  * Created by mtrupkin on 12/15/2014.
@@ -26,17 +23,17 @@ trait Intro { self: Controller =>
       val levelName = "layers-1"
       val is = getClass.getResourceAsStream(s"/levels/$levelName.xp")
       val image = RexPaintImage.read(levelName, is)
-
       val tileMap = TileMap.load(image.size, image.layers.head.matrix)
 
+      // create world
       val player = new Agent("Player", '@', Point(5, 5), Stats(str = 1)) {
         def act(world: World): Unit = ???
       }
-      val world = new World(player, tileMap)
+      val agents = Agent.toAgents(image.layers(1).matrix)
+      val world = new World(agents, player, tileMap)
 
-      val agents = Encounter.toAgents(image.layers(1).matrix)
+//      world.encounter = new CombatTracker(world)
 
-      world.encounter = new Encounter(world, agents)
       changeState(new GameController(world))
     }
     def handleLoadGame(event: ActionEvent) = println("handled")

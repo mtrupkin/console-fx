@@ -1,20 +1,20 @@
-package consolefx
+package me.mtrupkin.control
 
+import java.lang.Math._
 import javafx.scene.control.Label
-import javafx.scene.layout.{StackPane, Pane}
-import javafx.scene.paint.Color
-import javafx.scene.text.{FontWeight, Font}
+import javafx.scene.layout.{Pane, StackPane}
+import javafx.scene.paint.{Paint, Color}
+import javafx.scene.text.{Font, FontWeight}
 
-
-import me.mtrupkin.console.{Input, Screen, Size, Console, ScreenChar}
+import me.mtrupkin.console.{RGB, Screen, ScreenChar}
+import me.mtrupkin.core.Size
 
 import scala.Array._
-import Math._
 
 /**
  * Created by mtrupkin on 12/13/2014.
  */
-class ConsoleFx(val size: Size) extends Pane with Console {
+class ConsoleFx(val size: Size) extends Pane {
   setStyle("-fx-background-color: black;")
   val offsetX, offsetY = 1
 
@@ -49,14 +49,16 @@ class ConsoleFx(val size: Size) extends Pane with Console {
 
   def apply(x: Int, y: Int): Label = labels(x)(y)
 
-  def input(): Option[Input] = None
-
   // draw screen to window
   def draw(screen: Screen): Unit = screen.foreach(draw)
 
   def draw(x: Int, y: Int, s: ScreenChar): Unit = {
-    this(x, y).setText(s)
+    val l = this(x, y)
+    l.setText(s)
+    l.setTextFill(color(s.fg))
   }
+
+  def color(c: RGB): Color = new Color(c.r/255f, c.g/255f, c.b/255f, 1)
 
   def toPixel(p: (Int, Int)): (Double, Double) = {
     val (x, y) = p

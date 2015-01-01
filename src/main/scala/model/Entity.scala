@@ -1,8 +1,7 @@
 package me.mtrupkin.game.model
 
 import me.mtrupkin.console.ScreenChar
-import me.mtrupkin.console.Point
-
+import me.mtrupkin.core.Point
 /**
  * Created by mtrupkin on 12/19/2014.
  */

@@ -1,22 +1,18 @@
-package consolefx
+package me.mtrupkin.game.app
 
 import javafx.application.Application
-import javafx.scene.Scene
 import javafx.scene.image.Image
-import javafx.scene.paint.Color
 import javafx.stage.Stage
-import me.mtrupkin.console.{Size, Screen, Input}
 import me.mtrupkin.controller.Controller
-import me.mtrupkin.game.{ConsoleController}
-
+import me.mtrupkin.game.model.Simulator
+import scala.collection.JavaConversions._
 
 class ConsoleApp extends Application {
   override def start(primaryStage: Stage) {
     primaryStage.setTitle("Danger Room")
-    val img16 = new Image("icons/icon-16.png")
-    val img32 = new Image("icons/icon-32.png")
-    val img64 = new Image("icons/icon-64.png")
-    primaryStage.getIcons.addAll(img16, img32, img64)
+
+    val rs = List("/icons/icon-16.png", "/icons/icon-32.png", "/icons/icon-64.png")
+    primaryStage.getIcons.addAll(rs.map(new Image(_)))
 
     object Controller extends Controller {
       lazy val css = "/views/Console.css"
@@ -25,6 +21,12 @@ class ConsoleApp extends Application {
     }
 
     Controller.stage.show()
+
+    Simulator.simulate()
+  }
+
+  def icons(rs: Seq[String]): Seq[Image] = {
+    rs.map(r => new Image(r))
   }
 }
 

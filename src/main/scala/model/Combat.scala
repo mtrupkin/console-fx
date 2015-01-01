@@ -1,8 +1,8 @@
 package me.mtrupkin.game.model
 
-import java.lang.Math._
 
-import me.mtrupkin.console.Dice
+
+import me.mtrupkin.core.Dice
 
 /**
  * Created by mtrupkin on 12/19/2014.
@@ -42,18 +42,9 @@ object Combat {
   }
 }
 
-object Simulator extends App {
-  val attackers = List(Combat(0), Combat(0), Combat(0))
+object Simulator {
 
-  val encounters = for(i <- 0 until 10000) yield simulate(10, 0)
-  val rounds = encounters.map(_._1)
-  val attacks = encounters.flatMap(_._2)
-
-  import Statistics._
-  output("Number of rounds", rounds)
-  println(f"Damage taken: ${mean(attacks)}%3.3g")
-
-  def simulate(maxHP: Int, defense: Int): (Int, Seq[Int]) = {
+  def simulate(attackers: List[Combat], maxHP: Int, defense: Int): (Int, Seq[Int]) = {
     var hp = maxHP
     var round = 0
     var results: List[Int] = Nil
@@ -70,6 +61,16 @@ object Simulator extends App {
     round -> results
   }
 
+  def simulate(attackers: List[Combat] = List(Combat(0), Combat(0), Combat(0))): Unit = {
+    val encounters = for(i <- 0 until 10000) yield simulate(attackers, 10, 0)
+    val rounds = encounters.map(_._1)
+    val attacks = encounters.flatMap(_._2)
+
+    import Statistics._
+    output("Number of rounds", rounds)
+    println(f"Average damage taken per attack: ${mean(attacks)}%3.3g")
+
+  }
 }
 
 
@@ -85,7 +86,6 @@ object Statistics {
       (a,e) => a + math.pow(e - avg, 2.0)
     } / xs.size)
   }
-
 
   def output(s: String, xs: Seq[Int]): Unit = {
     println(s)

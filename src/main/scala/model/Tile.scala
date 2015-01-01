@@ -1,7 +1,9 @@
-package me.mtrupkin.game
+package me.mtrupkin.game.model
 
-import me.mtrupkin.console.{Screen, ScreenChar, Size}
 import me.mtrupkin.console.Colors._
+import me.mtrupkin.console.{Screen, ScreenChar}
+import me.mtrupkin.core.{Size}
+
 import scala.Array._
 
 /**

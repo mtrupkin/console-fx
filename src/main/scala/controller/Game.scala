@@ -1,27 +1,27 @@
 package me.mtrupkin.controller
 
 import javafx.collections.FXCollections._
-import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.scene.control.{Label, TableColumn, TableView}
-import javafx.scene.input.{KeyEvent, MouseEvent}
 import javafx.scene.layout.Pane
-
-import consolefx.ConsoleFx
+import me.mtrupkin.control.ConsoleFx
 import me.mtrupkin.console._
-import me.mtrupkin.controller.game.{AgentBean, KeyHandler}
+import me.mtrupkin.core.{Point, Points}
+import me.mtrupkin.controller.game.{AgentBean}
 import me.mtrupkin.game.model.World
 
-import scala.collection.JavaConversions._
 import scalafx.scene.{control => sfxc}
+import scalafx.scene.{layout => sfxl}
+import scalafx.scene.{input => sfxi}
 
+import scala.collection.JavaConversions._
+import scalafx.Includes._
 
 /**
  * Created by mtrupkin on 12/15/2014.
  */
 trait Game { self: Controller =>
-  class GameController(val world: World) extends ControllerState
-  with KeyHandler {
+  class GameController(val world: World) extends ControllerState {
     implicit def itos(int: Int): String = int.toString
     val name = "Game"
 
@@ -44,19 +44,19 @@ trait Game { self: Controller =>
     def initialize(): Unit = {
       console = new ConsoleFx(world.tileMap.size)
       console.setStyle("-fx-border-color: white")
-      console.setOnMouseMoved(new EventHandler[MouseEvent] {
-        override def handle(event: MouseEvent): Unit = handleMouseMove(event)
-      } )
-
-      console.setOnMouseExited(new EventHandler[MouseEvent] {
-        override def handle(event: MouseEvent): Unit = handleMouseExit(event)
-      } )
+      new sfxl.Pane(console) {
+        onMouseClicked = (e: sfxi.MouseEvent) => handleMouseClicked(e)
+        onMouseMoved = (e: sfxi.MouseEvent) => handleMouseMove(e)
+        onMouseExited = (e: sfxi.MouseEvent) => handleMouseExit(e)
+      }
 
       screen = Screen(world.tileMap.size)
       pane.getChildren.clear()
       pane.getChildren.add(console)
       pane.setFocusTraversable(true)
-      pane.setOnKeyPressed(this)
+      new sfxl.Pane(pane) {
+        onKeyPressed = (e: sfxi.KeyEvent) => handleKeyPressed(e)
+      }
 
       trackerTbl.setPlaceholder(new Label)
       trackerTbl.setMouseTransparent(true)
@@ -73,7 +73,7 @@ trait Game { self: Controller =>
     def update(elapsed: Int): Unit = {
       import world.player._
 
-      val agentModel = observableArrayList[AgentBean](world.encounter.activeAgents.map(a => new AgentBean(a)))
+      val agentModel = observableArrayList[AgentBean](world.agents.map(a => new AgentBean(a)))
       trackerTbl.setItems(agentModel)
 
       strText.setText(stats.str)
@@ -90,13 +90,15 @@ trait Game { self: Controller =>
       s"[${p.x}, ${p.y}]"
     }
 
-    def handleMouseMove(mouseEvent: MouseEvent): Unit = {
-      val (x, y) = (mouseEvent.getX, mouseEvent.getY)
+    def handleMouseClicked(mouseEvent: sfxi.MouseEvent): Unit = {}
+
+    def handleMouseMove(mouseEvent: sfxi.MouseEvent): Unit = {
+      val (x, y) = (mouseEvent.x, mouseEvent.y)
       for( s <- console.toScreen(x, y)) {
         val p: Point = s
         infoPosText.setText(p)
 
-        val target = world.encounter.activeAgents.find(a => a.position == p)
+        val target = world.agents.find(a => a.position == p)
         target match {
           case Some(t) => {
             infoText.setText(t.name)
@@ -109,13 +111,13 @@ trait Game { self: Controller =>
       }
     }
 
-    def handleMouseExit(mouseEvent: MouseEvent): Unit = {
+    def handleMouseExit(mouseEvent: sfxi.MouseEvent): Unit = {
       infoText.setText("")
       infoDescText.setText("")
       infoPosText.setText("")
     }
 
-    override def handle(event: KeyEvent): Unit = {
+    def handleKeyPressed(event: sfxi.KeyEvent): Unit = {
       import me.mtrupkin.console.Key._
       val key = keyCodeToConsoleKey(event)
       key match {
@@ -138,4 +140,12 @@ trait Game { self: Controller =>
       }
     }
   }
+
+  def keyCodeToConsoleKey(event: sfxi.KeyEvent): ConsoleKey = {
+    val modifier = Modifier(event.shiftDown, event.controlDown, event.altDown)
+    val jfxName = event.code.name
+    val key = Key.withName(jfxName)
+    ConsoleKey(key, modifier)
+  }
 }
+

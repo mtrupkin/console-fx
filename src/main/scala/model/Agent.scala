@@ -1,7 +1,8 @@
 package  me.mtrupkin.game.model
 
 
-import me.mtrupkin.console.{Point, ScreenChar}
+import me.mtrupkin.console.{ScreenChar}
+import me.mtrupkin.core.{Point, Size}
 
 /**
  * Created by mtrupkin on 12/19/2014.
@@ -31,4 +32,24 @@ abstract class Agent(val name: String,
   def ranged: Combat = Combat((dex + floor(str/2) + floor(int/3)))
 
   def defense: Int = floor((str + dex + int) / 3)
+}
+
+object Agent {
+  def toAgent(sc: ScreenChar, p: Point): Option[Agent] = {
+    sc.c match {
+      case 'T' => Some(new Agent("Turret", 'T', p) {
+        def act(world: World): Unit = Combat.attack(ranged, world.player)
+      })
+      case _ => None
+    }
+  }
+
+  def toAgents(matrix: Seq[Seq[ScreenChar]]): Seq[Agent] = {
+    val agents = for {
+      (i, x) <- matrix.zipWithIndex
+      (t, y) <- i.zipWithIndex
+    } yield toAgent(t, Point(x, y))
+
+    agents.flatten
+  }
 }

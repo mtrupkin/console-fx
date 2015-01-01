@@ -3,7 +3,8 @@ package rexpaint
 import java.io.{DataInputStream, InputStream}
 import java.util.zip.GZIPInputStream
 
-import me.mtrupkin.console.{Size, RGB, ScreenChar}
+import me.mtrupkin.console.{RGB, ScreenChar}
+import me.mtrupkin.core.Size
 
 /**
  * Created by mtrupkin on 12/14/2014.

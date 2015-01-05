@@ -2,7 +2,7 @@ package me.mtrupkin.game.model
 
 import me.mtrupkin.console.Colors._
 import me.mtrupkin.console.{Screen, ScreenChar}
-import me.mtrupkin.core.{Size}
+import me.mtrupkin.core.{Point, Size}
 
 import scala.Array._
 
@@ -19,11 +19,11 @@ trait Tile {
 class TileMap(val size: Size) {
   val tiles = ofDim[Tile](size.width, size.height)
 
-//  def apply(x: Int, y: Int): Tile = tiles(x)(y)
-  def apply(p: (Int, Int)): Tile = tiles(p._1)(p._2)
+  def apply(p: Point): Tile = tiles(p.x)(p.y)
   def foreach(f: (Int, Int, Tile) => Unit ) = size.foreach((x,y) => f(x, y, this(x, y)))
 
-  def move(x: Int, y: Int): Boolean = size.inBounds((x,y)) && this(x, y).move
+  def move(p: Point): Boolean = size.inBounds(p) && this(p).move
+  def moveCost(p: Point): Double = 1
   def update(elapsed: Int): Unit = size.foreach((x, y) => this(x, y).update(elapsed))
 
   def render(screen: Screen): Unit = foreach((x, y, t) => screen(x, y) = t.sc)

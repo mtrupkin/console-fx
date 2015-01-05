@@ -1,5 +1,6 @@
 package me.mtrupkin.game.model
 
+import core.AStarPathFinder
 import me.mtrupkin.console.{Colors, RGB, ScreenChar, Screen}
 import me.mtrupkin.core.Point
 
@@ -26,16 +27,17 @@ class CombatTracker(val world: World) {
     round += 1
   }
 
+  val finder = new AStarPathFinder(tileMap)
+
   def renderValidMove(screen: Screen, agent: Agent): Unit = {
     val move = agent.move
-    val finder = new PathFinder(agent, tileMap, move+1)
 
     val c: ScreenChar = new ScreenChar('.', RGB(31, 31, 31), Colors.Black)
     for(x <- (-move to move)) {
       for (y <- (-move to move)) {
-        val p = agent.position +(x, y)
+        val p = agent.position + (x, y)
         if (screen.size.inBounds(p)) {
-          val path = finder.findPath(p)
+          val path = finder.search(agent, p, move+1)
           // path list includes starting position
           val cost = calcMove(0, path)
           if ((cost > 0) && (cost <= move)) screen(p) = c

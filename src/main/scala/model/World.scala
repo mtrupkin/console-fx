@@ -54,7 +54,7 @@ class World (
       return true
     }
 
-    if (tileMap.move(p.x, p.y)) {
+    if (tileMap.move(p)) {
       player.move(direction)
       true
     } else false

@@ -20,13 +20,13 @@ class TileMap(val size: Size) {
   val tiles = ofDim[Tile](size.width, size.height)
 
   def apply(p: Point): Tile = tiles(p.x)(p.y)
-  def foreach(f: (Int, Int, Tile) => Unit ) = size.foreach((x,y) => f(x, y, this(x, y)))
+  def foreach(f: (Point, Tile) => Unit ) = size.foreach(p => f(p, this(p)))
 
-  def move(p: Point): Boolean = size.inBounds(p) && this(p).move
+  def move(p: Point): Boolean = size.in(p) && this(p).move
   def moveCost(p: Point): Double = 1
-  def update(elapsed: Int): Unit = size.foreach((x, y) => this(x, y).update(elapsed))
+  def update(elapsed: Int): Unit = size.foreach(p => this(p).update(elapsed))
 
-  def render(screen: Screen): Unit = foreach((x, y, t) => screen(x, y) = t.sc)
+  def render(screen: Screen): Unit = foreach((p, t) => screen(p) = t.sc)
 }
 
 class Floor extends Tile {

@@ -24,9 +24,8 @@ class World (
     time += elapsed
   }
 
-  def renderAgent(screen: Screen, agent: Agent): Unit ={
-    val p = agent.position
-    screen.write(p.x, p.y, agent.sc)
+  def renderAgent(screen: Screen, agent: Agent): Unit = {
+    screen.write(agent.position, agent.sc)
   }
 
   def render(screen: Screen): Unit ={

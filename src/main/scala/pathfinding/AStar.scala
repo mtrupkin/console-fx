@@ -51,7 +51,7 @@ class AStar(val tileMap: TileMap) {
   val size = tileMap.size
   val nodes = ofDim[Node](size.width, size.height)
   def nodes(p: Point): Node = nodes(p.x)(p.y)
-  size.foreach((x, y) => nodes(x)(y) = new Node(Point(x, y)))
+  size.foreach(p => nodes(p.x)(p.y) = new Node(p))
 
   // nodes that have been searched through
   val closed = mutable.ListBuffer.empty[Node]
@@ -76,7 +76,7 @@ class AStar(val tileMap: TileMap) {
     closed.clear
     open.clear
     addToOpen(startNode)
-    size.foreach((x, y) => nodes(x)(y).reset)
+    size.foreach(p => nodes(p.x)(p.y).reset)
 
     val targetNode = nodes(p)
     targetNode.parent = None

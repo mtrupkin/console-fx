@@ -2,7 +2,7 @@ package me.mtrupkin.game.model
 
 import me.mtrupkin.console.{Colors, RGB, ScreenChar, Screen}
 import me.mtrupkin.core.{Size, Point}
-import me.mtrupkin.pathfinding.{Dijkstra, AStar}
+import me.mtrupkin.pathfinding.{PathFinder, Dijkstra, AStar}
 
 
 /**
@@ -10,7 +10,6 @@ import me.mtrupkin.pathfinding.{Dijkstra, AStar}
  */
 class CombatTracker(val world: World) {
   import world._
-  type Matrix = Array[Array[Double]]
   var round: Int = 0
 
   def render(screen: Screen): Unit = {
@@ -24,12 +23,10 @@ class CombatTracker(val world: World) {
     for(agent <- agents) {
       agent.act(world)
     }
-    dijkstraMap = validMoves(player)
     round += 1
   }
 
-  val dijkstraPathFinder = new Dijkstra(tileMap)
-  var dijkstraMap = validMoves(player)
+  val pathFinder: PathFinder = new Dijkstra(tileMap)
 
   val pathChar = new ScreenChar('*', RGB(123, 123, 123), Colors.Black)
   def pathChar(i: Int) = new ScreenChar(i.toString.charAt(0), RGB(123, 123, 123), Colors.Black)
@@ -37,50 +34,25 @@ class CombatTracker(val world: World) {
   def validMoveChar(i: Int) = new ScreenChar(i.toString.charAt(0), RGB(31, 31, 31), Colors.Black)
 
   def renderPath(screen: Screen, target: Point, agent: Agent): Unit = {
-    val p = target - agent.position
+    val moves = pathFinder.moves(target, agent.position, agent.move)
+    if ((moves > 0) && (moves <= agent.move))
     for {
-
-      n <- path(p, Nil)
-    } {
-      screen(n + agent.position) = pathChar
-    }
-  }
-
-  def path(p: Point, acc: List[Point]): Seq[Point] = {
-    val bounds = Size(player.maxMove, player.maxMove)
-    if (bounds.inBounds(p)) {
-      val cost = dijkstraMap(p.x)(p.y).toInt
-      cost match {
-        case 0 => acc
-        case _ => {
-          val n = for {
-            x <- -1 to 1
-            y <- -1 to 1
-            p0 = p + (x, y)
-            if bounds.inBounds(p0)
-            if (dijkstraMap(p0.x)(p0.y) < cost)
-          } yield p0
-          path(n.head, p :: acc)
-        }
-      }
-    } else Nil
+      n <- pathFinder.path(target, agent.position)
+    } screen(n) = pathChar
   }
 
   def renderValidMove(screen: Screen, agent: Agent): Unit = {
     val move = agent.move
+    val p0 = agent.position
 
-    for(x <- (-move to move)) {
-      for (y <- (-move to move)) {
-        val p = agent.position + (x, y)
-        if (screen.size.inBounds(p)) {
-            val cost = dijkstraMap(x+move)(y+move).toInt
-            if ((cost > 0) && (cost <= move)) screen(p) = validMoveChar(cost)
-        }
-      }
-    }
+    for {
+      x <- -move to move
+      y <- -move to move
+      p = p0 + (x, y)
+      moves = pathFinder.moves(p, p0, move)
+      if ((moves > 0) && (moves <= move))
+    } screen(p) = validMoveChar(moves)
   }
-
-  def validMoves(agent: Agent): Matrix = dijkstraPathFinder.search(agent.position, agent.maxMove)
 }
 
 

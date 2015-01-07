@@ -1,70 +1,79 @@
 package me.mtrupkin.pathfinding
 
-import me.mtrupkin.core.Point
+
+import me.mtrupkin.core.{Points, Size, Point, Matrix}
 import me.mtrupkin.game.model.TileMap
 
-import scala.Array._
 import scala.collection.mutable
 
 /**
  * Created by mtrupkin on 1/2/2015.
  */
-class Dijkstra(val tileMap: TileMap) {
-  case class Node(p: Point, weight: Int = 1, dist: Double = Double.MaxValue) extends Ordered[Node] {
+class Dijkstra(val tileMap: TileMap) extends PathFinder {
+  protected case class Node(p: Point, weight: Int = 1, dist: Double = Double.MaxValue) extends Ordered[Node] {
     override def compare(o: Node): Int = (o.dist-dist).toInt
     override def toString: String = s"$p dist: $dist"
   }
-
-  val size = tileMap.size
-  val nodes = ofDim[Node](size.width, size.height)
-  def nodes(p: Point): Node = nodes(p.x)(p.y)
-  size.foreach((x, y) => nodes(x)(y) = new Node(Point(x, y)))
+  protected val size = tileMap.size
+  protected val nodes = new Matrix[Node](size)
+  protected var start: Point = _
 
   // dijkstra's algorithm using a binary heap.
-  def search(p: Point, r: Int): Array[Array[Double]] = {
+  protected def search(p: Point, r: Int): Unit = {
     var q = new mutable.PriorityQueue[Node]()
-    size.foreach((x, y) => nodes(x)(y) = nodes(x)(y).copy(dist = Double.MaxValue))
 
-    q += nodes(p).copy(dist = 0)
+    size.foreach(p => nodes(p) = Node(p)) // optimization candidate
+
+    // add source node
+    val source = nodes(p).copy(dist = 0)
+    nodes(p) = source
+    q += source
 
     while (!q.isEmpty) {
-      val u = q.dequeue() // vertex with shortest distance (first iteration will return source)
+      // node with shortest distance
+      val u = q.dequeue()
 
-      // look at distances to each neighbour
-      for (v <- legalNeighbours(u.p).map(nodes(_))) {
-        val newDist = u.dist + v.weight
-        if ((newDist < v.dist) && (newDist <= r)) {
-          // shorter path to neighbour found
-          val newNode = v.copy(dist = newDist)
-          nodes(v.p.x)(v.p.y) = newNode
-          q += newNode
-        }
+      // look at each neighbour
+      for {
+        v <- neighbours(u.p)
+        newDist = u.dist + v.weight
+        if ((newDist < v.dist) && (newDist <= r))
+      } {
+        // shorter path to neighbour found
+        val newNode = v.copy(dist = newDist)
+        nodes(v.p) = newNode
+        q += newNode
       }
     }
+  }
 
-    val d = 2*r+1
-    val m = ofDim[Double](d, d)
-
+  protected def neighbours(p: Point): Seq[Node] = {
     for {
-      n <- neighbours(r)
-      p0 = n + p
-      if size.inBounds(p0)
-    } {
-      m(n.x+r)(n.y+r) = nodes(p0).dist
+      n <- size.neighbors(p)
+      if tileMap.move(n)
+    } yield nodes(n)
+  }
+
+  protected def path(p: Point, acc: List[Point]): List[Point] = {
+    val dist = nodes(p).dist
+
+    if (dist == 0) return acc
+
+    val ns = for {
+      n <- size.neighbors(p)
+      if (nodes(n).dist < dist)
+    } yield n
+
+    if (ns != Nil) path(ns.head, p :: acc) else {
+      ???
     }
-
-    m
   }
 
-  def neighbours(r: Int = 1): Seq[Point] = {
-    for {
-      x <- -r to r
-      y <- -r to r
-      if !((x == 0) && (y == 0))
-    } yield Point(x, y)
+  def moves(p: Point, p0: Point, r: Int): Int = {
+    if (!size.in(p)) return Int.MaxValue
+    if (p0 != start) search(p0, r)
+    nodes(p).dist.toInt
   }
 
-  def legalNeighbours(p: Point, r: Int = 1): Seq[Point] = {
-    neighbours(r).map(_ + p).filter(size.inBounds(_)).filter(tileMap.move(_))
-  }
+  def path(p: Point, p0: Point): List[Point] = if (tileMap.size.in(p)) path(p, Nil) else Nil
 }

@@ -1,6 +1,6 @@
-package core
+package me.mtrupkin.pathfinding
 
-import me.mtrupkin.core.{Point, Size}
+import me.mtrupkin.core.Point
 import me.mtrupkin.game.model.{Agent, TileMap}
 
 import scala.Array._
@@ -9,47 +9,45 @@ import scala.collection.mutable
 /**
  * Created by mtrupkin on 12/31/2014.
  */
+class AStar(val tileMap: TileMap) {
+  class Node(val p: Point) extends Ordered[Node] {
+    // path cost
+    var cost = 0.0d
+    // parent of this node, how we reached it in the search
+    var parent: Option[Node] = None
+    // heuristic cost
+    var heuristic = 0.0d
+    // search depth
+    var depth = 0
+    // in open list
+    var open = false
+    // in closed list
+    var closed = false
 
-class Node(val p: Point) extends Ordered[Node] {
-  // path cost
-  var cost = 0.0d
-  // parent of this node, how we reached it in the search
-  var parent: Option[Node] = None
-  // heuristic cost
-  var heuristic = 0.0d
-  // search depth
-  var depth = 0
-  // in open list
-  var open = false
-  // in closed list
-  var closed = false
+    def setParent(newParent: Node): Int = {
+      parent = Some(newParent)
+      depth = newParent.depth + 1
 
-  def setParent(newParent: Node): Int = {
-    parent = Some(newParent)
-    depth = newParent.depth + 1
+      depth
+    }
 
-    depth
+    def reset(): Unit = {
+      closed = false
+      open = false
+      cost = 0
+      depth = 0
+    }
+
+    override def compare(o: Node): Int = {
+      val f = heuristic + cost
+      val of = o.heuristic + o.cost
+      Math.signum(of-f).toInt
+    }
+
+    override def toString: String = {
+      s"$p open: $open closed: $closed cost: $cost heuristic: $heuristic"
+    }
   }
-
-  def reset(): Unit = {
-    closed = false
-    open = false
-    cost = 0
-    depth = 0
-  }
-
-  override def compare(o: Node): Int = {
-    val f = heuristic + cost
-    val of = o.heuristic + o.cost
-    Math.signum(of-f).toInt
-  }
-
-  override def toString: String = {
-    s"$p open: $open closed: $closed cost: $cost heuristic: $heuristic"
-  }
-}
-
-class AStarPathFinder(val tileMap: TileMap) {
   val size = tileMap.size
   val nodes = ofDim[Node](size.width, size.height)
   def nodes(p: Point): Node = nodes(p.x)(p.y)
@@ -110,7 +108,7 @@ class AStarPathFinder(val tileMap: TileMap) {
           x <- -1 to 1
           y <- -1 to 1
           if !((x == 0) && (y == 0))
-        } yield {
+        } {
           // determine the location of the neighbour and evaluate it
           val np = Point(x + current.p.x, y + current.p.y)
           if (tileMap.move(np)) {

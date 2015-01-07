@@ -97,7 +97,7 @@ trait Game { self: Controller =>
       for( s <- console.toScreen(x, y)) {
         val p: Point = s
         infoPosText.setText(p)
-
+        world.mouse = Some(p)
         val target = world.agents.find(a => a.position == p)
         target match {
           case Some(t) => {
@@ -112,6 +112,7 @@ trait Game { self: Controller =>
     }
 
     def handleMouseExit(mouseEvent: sfxi.MouseEvent): Unit = {
+      world.mouse = None
       infoText.setText("")
       infoDescText.setText("")
       infoPosText.setText("")

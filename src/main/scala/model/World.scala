@@ -18,6 +18,7 @@ class World (
   def agents: Seq[Agent] = agents0.filter(_.hp >= 0)
 
   val tracker: CombatTracker = new CombatTracker(this)
+  var mouse: Option[Point] = None
 
   def update(elapsed: Int) {
     time += elapsed

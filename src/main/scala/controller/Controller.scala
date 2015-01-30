@@ -17,6 +17,7 @@ import scalafx.animation.AnimationTimer
 
 trait Controller extends StateMachine
   with Intro
+  with Outro
   with Game {
   type StateType = ControllerState
 
@@ -31,15 +32,16 @@ trait Controller extends StateMachine
   scene.getStylesheets.add(cssLocation)
   stage.setScene(scene)
 
+  var lastPulse: Long = _
+  val timer = AnimationTimer((now: Long) => {
+    currentState.update(((now-lastPulse)/100000).toInt)
+    lastPulse = now
+  })
+
+
   trait ControllerState extends State {
     def name: String
     def templateName: String = s"/views/$name.fxml"
-
-    var lastPulse: Long = _
-    val timer = AnimationTimer((now: Long) => {
-      update((now-lastPulse).toInt)
-      lastPulse = now
-    })
 
     def root: Parent = {
       val is = getClass.getResourceAsStream(templateName)
@@ -48,10 +50,12 @@ trait Controller extends StateMachine
       loader.load[Parent](is)
     }
 
+    def update(elapsed: Int): Unit = {}
+
     override def onEnter(): Unit = {
       val t = new Thread(new Runnable {
         override def run(): Unit = {
-          val newRoot = root
+          val newRoot = root // potentially long-running
           Platform.runLater(new Runnable {
             override def run(): Unit = scene.setRoot(newRoot)
           })

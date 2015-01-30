@@ -1,9 +1,14 @@
 package me.mtrupkin.controller
 
-import javafx.event.ActionEvent
 
-import me.mtrupkin.game.model.{Stats, Agent, World}
-import me.mtrupkin.game.model.TileMap
+import java.io.{FileWriter, Writer}
+import java.nio.file.{StandardOpenOption, OpenOption, Paths, Files}
+import javafx.event.ActionEvent
+import javafx.fxml.FXML
+import javafx.scene.control.Button
+
+import me.mtrupkin.game.model.TileMap._
+import me.mtrupkin.game.model._
 import rexpaint.RexPaintImage
 import me.mtrupkin.core.{Point, Size}
 
@@ -17,26 +22,35 @@ trait Intro { self: Controller =>
   class IntroController extends ControllerState {
     val name = "Intro"
 
-    def update(elapsed: Int): Unit = ???
+    @FXML var continueGameButton: Button = _
+
+    def initialize(): Unit = {
+      continueGameButton.setDisable(!World.exists())
+    }
+
+    def handleContinueGame(event: ActionEvent) = {
+      val world = World.read()
+
+      changeState(new GameController(new CombatTracker(world)))
+    }
 
     def handleNewGame(event: ActionEvent) = {
       val levelName = "layers-1"
-      val is = getClass.getResourceAsStream(s"/levels/$levelName.xp")
-      val image = RexPaintImage.read(levelName, is)
-      val tileMap = TileMap.load(image.size, image.layers.head.matrix)
 
       // create world
-      val player = new Agent("Player", '@', Point(5, 5), Stats(str = 1)) {
-        def act(world: World): Unit = ???
-      }
-      val agents = Agent.toAgents(image.layers(1).matrix)
+
+      val is = getClass.getResourceAsStream(s"/levels/$levelName.xp")
+      val image = RexPaintImage.read(levelName, is)
+      val tileMap = TileMap.load(levelName, image.size, image.layers.head.matrix)
+
+      val (player, agents) = Agent.toAgents(image.layers(1).matrix)
       val world = new World(agents, player, tileMap)
 
-//      world.encounter = new CombatTracker(world)
+      World.write(world)
 
-      changeState(new GameController(world))
+
+      changeState(new GameController(new CombatTracker(world)))
     }
-    def handleLoadGame(event: ActionEvent) = println("handled")
     def handleOptions(event: ActionEvent) = println("handled")
     def handleExit(event: ActionEvent) = stage.close()
   }

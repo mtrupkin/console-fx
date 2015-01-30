@@ -7,9 +7,9 @@ import javafx.scene.layout.Pane
 import me.mtrupkin.control.ConsoleFx
 import me.mtrupkin.console._
 import me.mtrupkin.core.{Point, Points}
-import me.mtrupkin.controller.game.{AgentBean}
-import me.mtrupkin.game.model.World
+import me.mtrupkin.game.model.{CombatTracker, Agent, World}
 
+import scalafx.beans.property.StringProperty
 import scalafx.scene.{control => sfxc}
 import scalafx.scene.{layout => sfxl}
 import scalafx.scene.{input => sfxi}
@@ -21,7 +21,7 @@ import scalafx.Includes._
  * Created by mtrupkin on 12/15/2014.
  */
 trait Game { self: Controller =>
-  class GameController(val world: World) extends ControllerState {
+  class GameController(val tracker: CombatTracker) extends ControllerState {
     implicit def itos(int: Int): String = int.toString
     val name = "Game"
 
@@ -31,7 +31,7 @@ trait Game { self: Controller =>
     @FXML var strText: Label = _
     @FXML var dexText: Label = _
     @FXML var intText: Label = _
-    @FXML var moveText: Label = _
+    @FXML var actionsText: Label = _
     @FXML var hpText: Label = _
     @FXML var infoText: Label = _
     @FXML var infoDescText: Label = _
@@ -42,7 +42,8 @@ trait Game { self: Controller =>
     var screen: Screen = _
 
     def initialize(): Unit = {
-      console = new ConsoleFx(world.tileMap.size)
+      val consoleSize = tracker.world.tileMap.size
+      console = new ConsoleFx(consoleSize)
       console.setStyle("-fx-border-color: white")
       new sfxl.Pane(console) {
         onMouseClicked = (e: sfxi.MouseEvent) => handleMouseClicked(e)
@@ -50,7 +51,7 @@ trait Game { self: Controller =>
         onMouseExited = (e: sfxi.MouseEvent) => handleMouseExit(e)
       }
 
-      screen = Screen(world.tileMap.size)
+      screen = Screen(consoleSize)
       pane.getChildren.clear()
       pane.getChildren.add(console)
       pane.setFocusTraversable(true)
@@ -70,69 +71,82 @@ trait Game { self: Controller =>
       timer.start()
     }
 
-    def update(elapsed: Int): Unit = {
-      import world.player._
+    override def update(elapsed: Int): Unit = {
+      import tracker.world.player._
 
-      val agentModel = observableArrayList[AgentBean](world.agents.map(a => new AgentBean(a)))
+      val agentModel = observableArrayList[AgentBean](tracker.agents.map(a => new AgentBean(a)))
       trackerTbl.setItems(agentModel)
 
       strText.setText(stats.str)
       dexText.setText(stats.dex)
       intText.setText(stats.int)
-      moveText.setText(move)
+      actionsText.setText(tracker.actionsLeft)
       hpText.setText(hp)
 
-      world.render(screen)
+      // TODO: update and render at different rates
+      tracker.update(elapsed)
+      tracker.render(screen)
+
       console.draw(screen)
+      if (tracker.end) {
+
+        changeState(new OutroController)
+      }
     }
 
     implicit def pointToString(p: Point): String = {
       s"[${p.x}, ${p.y}]"
     }
 
-    def handleMouseClicked(mouseEvent: sfxi.MouseEvent): Unit = {}
+    def handleMouseClicked(mouseEvent: sfxi.MouseEvent): Unit = {
+      for( p <- mouseToPoint(mouseEvent)) {
+        tracker.target(p)
+      }
+    }
 
     def handleMouseMove(mouseEvent: sfxi.MouseEvent): Unit = {
-      val (x, y) = (mouseEvent.x, mouseEvent.y)
-      for( s <- console.toScreen(x, y)) {
-        val p: Point = s
+      for( p <- mouseToPoint(mouseEvent)) {
         infoPosText.setText(p)
-        world.mouse = Some(p)
-        val target = world.agents.find(a => a.position == p)
+        tracker.mouse = Some(p)
+
+        tracker.getAction(p) match {
+          case Some(action) => infoDescText.setText(action.name)
+          case None => infoDescText.setText("")
+        }
+
+        val target = tracker.agents.find(a => a.position == p)
         target match {
-          case Some(t) => {
-            infoText.setText(t.name)
-            infoDescText.setText(t.hp)
-          }
-          case None => {
-            infoText.setText(world.tileMap(p).name)
-          }
+          case Some(t) => infoText.setText(t.name)
+          case None => infoText.setText(tracker.world.tileMap(p).name)
         }
       }
     }
 
     def handleMouseExit(mouseEvent: sfxi.MouseEvent): Unit = {
-      world.mouse = None
+      tracker.mouse = None
       infoText.setText("")
       infoDescText.setText("")
       infoPosText.setText("")
     }
+
+    def mouseToPoint(mouseEvent: sfxi.MouseEvent): Option[Point] = console.toScreen(mouseEvent.x, mouseEvent.y)
 
     def handleKeyPressed(event: sfxi.KeyEvent): Unit = {
       import me.mtrupkin.console.Key._
       val key = keyCodeToConsoleKey(event)
       key match {
         case ConsoleKey(Q, Modifiers.Control) => {
+          World.write(tracker.world)
           changeState(new IntroController)
         }
         case ConsoleKey(X, Modifiers.Control) => {
           //closed = true
         }
         case ConsoleKey(k, _) => k match {
-          case W | Up => world.act(Points.Up)
-          case A | Left => world.act(Points.Left)
-          case S | Down => world.act(Points.Down)
-          case D | Right => world.act(Points.Right)
+//          case W | Up => world.act(Points.Up)
+//          case A | Left => world.act(Points.Left)
+//          case S | Down => world.act(Points.Down)
+//          case D | Right => world.act(Points.Right)
           case Enter => ???
           //case Escape => flipState(new EscapeMenuController(world))
           case _ =>
@@ -147,6 +161,11 @@ trait Game { self: Controller =>
     val jfxName = event.code.name
     val key = Key.withName(jfxName)
     ConsoleKey(key, modifier)
+  }
+
+  class AgentBean(agent: Agent) {
+    val name = new StringProperty(this, "name", agent.name)
+    val hp = new StringProperty(this, "hp", agent.hp.toString)
   }
 }
 

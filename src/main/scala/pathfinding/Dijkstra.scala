@@ -9,7 +9,7 @@ import scala.collection.mutable
 /**
  * Created by mtrupkin on 1/2/2015.
  */
-class Dijkstra(val tileMap: TileMap) extends PathFinder {
+class Dijkstra(val tileMap: TileMap) {
   protected case class Node(p: Point, weight: Int = 1, dist: Double = Double.MaxValue) extends Ordered[Node] {
     override def compare(o: Node): Int = (o.dist-dist).toInt
     override def toString: String = s"$p dist: $dist"
@@ -21,7 +21,7 @@ class Dijkstra(val tileMap: TileMap) extends PathFinder {
   // dijkstra's algorithm using a binary heap.
   protected def search(p: Point, r: Int): Unit = {
     var q = new mutable.PriorityQueue[Node]()
-
+    start = p
     size.foreach(p => nodes(p) = Node(p)) // optimization candidate
 
     // add source node
@@ -54,7 +54,7 @@ class Dijkstra(val tileMap: TileMap) extends PathFinder {
     } yield nodes(n)
   }
 
-  protected def path(p: Point, acc: List[Point]): List[Point] = {
+  protected def path(p: Point, acc: List[Point]): Seq[Point] = {
     val dist = nodes(p).dist
 
     if (dist == 0) return acc
@@ -64,16 +64,14 @@ class Dijkstra(val tileMap: TileMap) extends PathFinder {
       if (nodes(n).dist < dist)
     } yield n
 
-    if (ns != Nil) path(ns.head, p :: acc) else {
-      ???
-    }
+    if (ns != Nil) path(ns.head, p :: acc) else Nil
   }
 
-  def moves(p: Point, p0: Point, r: Int): Int = {
+  def moveCount(p: Point, p0: Point, r: Int): Int = {
     if (!size.in(p)) return Int.MaxValue
     if (p0 != start) search(p0, r)
     nodes(p).dist.toInt
   }
 
-  def path(p: Point, p0: Point): List[Point] = if (tileMap.size.in(p)) path(p, Nil) else Nil
+  def path(p: Point, p0: Point): Seq[Point] = if (tileMap.size.in(p)) path(p, Nil) else Nil
 }

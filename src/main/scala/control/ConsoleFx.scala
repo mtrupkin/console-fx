@@ -22,7 +22,7 @@ class ConsoleFx(val size: Size) extends Pane {
   val charBounds = ConsoleFx.charBounds(font)
   val stacks = new Matrix[StackPane](size)
   val labels = new Matrix[Label](size)
-  val (conWidth, conHeight) = toPixel(size)
+  val (conWidth, conHeight) = toPixel(Point(size.width, size.height))
   val (sizeX, sizeY) = (conWidth + offsetX * 2, conHeight + offsetY * 2)
   setPrefSize(sizeX, sizeY)
   setMinSize(sizeX, sizeY)
@@ -60,18 +60,17 @@ class ConsoleFx(val size: Size) extends Pane {
 
   def color(c: RGB): Color = new Color(c.r/255f, c.g/255f, c.b/255f, 1)
 
-  def toPixel(p: (Int, Int)): (Double, Double) = {
-    val (x, y) = p
+  def toPixel(p: Point): (Double, Double) = {
     val (width, height) = charBounds
 
-    (x * width + offsetX, y * height + offsetY)
+    (p.x * width + offsetX, p.y * height + offsetY)
   }
 
   def floor(d: Double): Int = Math.floor(d).toInt
 
-  def toScreen(x: Double, y: Double): Option[(Int, Int)] = {
+  def toScreen(x: Double, y: Double): Option[Point] = {
     val (width, height) = charBounds
-    val c = (floor((x-offsetX) / width), floor((y-offsetY) / height))
+    val c = Point(floor((x-offsetX) / width), floor((y-offsetY) / height))
     if (size.in(c)) Some(c) else None
   }
 

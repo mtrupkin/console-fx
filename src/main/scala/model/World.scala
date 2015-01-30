@@ -1,66 +1,78 @@
 package me.mtrupkin.game.model
 
+import java.io._
+import java.nio.file.{StandardOpenOption, Path, Paths, Files}
+
 import me.mtrupkin.console.Screen
 import me.mtrupkin.core.{Point, Size}
-
-import scala.collection.mutable.ListBuffer
+import play.api.libs.json._
+import rexpaint.RexPaintImage
 
 
 /**
  * Created by mtrupkin on 12/19/2014.
  */
 class World (
-  val agents0: Seq[Agent],
+  val agents: Seq[Agent],
   val player: Agent,
   var tileMap: TileMap,
-  var time: Long = 0) {
-
-  def agents: Seq[Agent] = agents0.filter(_.hp >= 0)
-
-  val tracker: CombatTracker = new CombatTracker(this)
-  var mouse: Option[Point] = None
+  var time: Long = 0)  {
 
   def update(elapsed: Int) {
     time += elapsed
   }
 
-  def renderAgent(screen: Screen, agent: Agent): Unit = {
-    screen.write(agent.position, agent.sc)
-  }
-
-  def render(screen: Screen): Unit ={
+  def render(screen: Screen): Unit = {
     tileMap.render(screen)
-    tracker.render(screen)
 
     renderAgent(screen, player)
-    for (a <- agents) {
-      renderAgent(screen, a)
-    }
   }
 
-  def act(direction: Point): Boolean = {
-    val action = tryAct(direction)
-    if (action) {
-      tracker.nextTurn()
-    }
+  def renderAgent(screen: Screen, agent: Agent): Unit = screen.write(agent.position, agent.sc)
+}
 
-    action
+case class AgentJS(name: String, position: Point, hp: Int)
+case class WorldJS(levelName: String, agents: Seq[AgentJS], player: AgentJS, time: Long)
+
+object World {
+  val saveDirectory = Paths.get("./save")
+  val savePath = saveDirectory.resolve("game.json")
+
+  import scala.collection.JavaConversions._
+  implicit val formatAgent = Json.format[AgentJS]
+  implicit val formatWorld = Json.format[WorldJS]
+
+  def read(): World = {
+    val is = Files.newInputStream(savePath)
+    val json = Json.parse(is)
+    val worldJS = Json.fromJson[WorldJS](json).get
+    val tileMap = TileMap.load(worldJS.levelName)
+    new World(worldJS.agents.map(toAgent(_)), toAgent(worldJS.player), tileMap, worldJS.time)
   }
 
-  def tryAct(direction: Point): Boolean = {
-    val p = player.position + direction
-    for (a <- agents.find(a => a.position == p) ) {
-      attack(a)
-      return true
-    }
+  def write(world: World): Unit = {
+    val worldJS = WorldJS(world.tileMap.levelName, world.agents.map(toAgentJS(_)), toAgentJS(world.player), world.time)
+    val json = Json.toJson(worldJS)
 
-    if (tileMap.move(p)) {
-      player.move(direction)
-      true
-    } else false
+    Files.write(savePath, Seq(Json.prettyPrint(json)), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
   }
 
-  def attack(a: Agent): Unit = {
-    Combat.attack(player.melee, a)
+  def exists(): Boolean = Files.exists(savePath)
+
+  def delete(): Unit = Files.delete(savePath)
+
+  protected def toAgentJS(agent: Agent): AgentJS = {
+    AgentJS(agent.name, agent.position, agent.hp)
+  }
+
+  protected def toAgent(agentJS: AgentJS): Agent = {
+    agentJS.name match {
+      case "Turret" => new Agent (agentJS.name, 'T', agentJS.position, currentHP = Some(agentJS.hp) ) {
+        def act (tracker: CombatTracker): Unit = tracker.attack (this, tracker.world.player) //Combat.attack(ranged, world.player)
+      }
+      case _ =>  new Agent(agentJS.name, '@', agentJS.position, Stats(str = 1), Some(agentJS.hp)) {
+        def act(tracker: CombatTracker): Unit = ???
+      }
+    }
   }
 }

@@ -1,5 +1,6 @@
 package me.mtrupkin.game.app
 
+import java.nio.file.{Paths, Files}
 import javafx.application.Application
 import javafx.scene.image.Image
 import javafx.stage.Stage
@@ -21,8 +22,6 @@ class ConsoleApp extends Application {
     }
 
     Controller.stage.show()
-
-    Simulator.simulate()
   }
 
   def icons(rs: Seq[String]): Seq[Image] = {

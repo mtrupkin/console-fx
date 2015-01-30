@@ -40,8 +40,8 @@
                   <Label fx:id="dexText" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Label text="Intellect:" GridPane.rowIndex="2" />
                   <Label fx:id="intText" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <Label text="Movement:" GridPane.rowIndex="4" />
-                  <Label fx:id="moveText" text="0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <Label text="Actions:" GridPane.rowIndex="4" />
+                  <Label fx:id="actionsText" text="0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                    <Label text="Hit Points:" GridPane.rowIndex="5" />
                    <Label fx:id="hpText" text="0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                </children>

@@ -43,7 +43,7 @@ trait Intro { self: Controller =>
       val image = RexPaintImage.read(levelName, is)
       val tileMap = TileMap.load(levelName, image.size, image.layers.head.matrix)
 
-      val (player, agents) = Agent.toAgents(image.layers(1).matrix)
+      val (player, agents) = Entity.toEntities(image.layers(1).matrix)
       val world = new World(agents, player, tileMap)
 
       World.write(world)

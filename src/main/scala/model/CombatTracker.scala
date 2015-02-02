@@ -5,6 +5,7 @@ import me.mtrupkin.core.{StateMachine, Size, Point}
 import me.mtrupkin.pathfinding.{Dijkstra, AStar}
 
 import scala.collection.immutable.List
+import scala.collection.mutable.ListBuffer
 
 
 /**
@@ -19,14 +20,16 @@ class CombatTracker(val world: World) extends StateMachine  {
     def update(elapsed: Int): Unit
     def render(screen: Screen): Unit
     def target(p: Point): Unit = {}
+    def handleComplete(sender: ActionState) = changeState(nextAction())
   }
+
+  def complete(sender: ActionState) = currentState.handleComplete(sender)
 
   def end: Boolean = {
     (agents == Nil) || (player.hp < 0)
   }
 
   var round: Int = 0
-  var actionsLeft: Int = 2
 
   var mouse: Option[Point] = None
 
@@ -59,23 +62,28 @@ class CombatTracker(val world: World) extends StateMachine  {
   def target(p: Point): Unit = currentState.target(p)
 
   def nextAction(): ActionState = {
-    if (actionsLeft > 0) new InputAction
+    if (player.ap > 0) new InputAction
     else {
-      actionsLeft = 2
-      round += 1
       enemyAction()
     }
   }
 
-  def enemyAction(): ActionState = {
-    for(agent <- agents) {
-      agent.act(this)
-    }
+  def endRound(): Unit = {
+    val entities = player :: agents.toList
+    entities.foreach(_.endRound())
 
-    ???
+    round += 1
   }
 
-  def attack(attacker: Agent, defender: Agent, resolution: (Combat, Int) => Int = Combat.attack): Boolean = {
+  def enemyAction(): ActionState = {
+    val actions = for {
+      agent <- agents
+    } yield agent.getAction(this)
+
+    new CompositeActionState(actions.flatten.map(getActionState(_)))
+  }
+
+  def attack(attacker: Entity, defender: Entity, resolution: (Combat, Int) => Int = Combat.attack): Boolean = {
     val lineOfSight = this.lineOfSight(attacker.position, defender.position)
     if (lineOfSight != Nil) {
       Combat.attack(attacker.melee, defender, resolution)
@@ -99,30 +107,37 @@ class CombatTracker(val world: World) extends StateMachine  {
     if (line.forall(world.tileMap(_).move)) line else Nil
   }
 
-  val actions = List(new AttackAction(this), new MoveAction(this))
+  val actionOptions = List(new AttackOption(this), new MoveOption(this))
 
   def getAction(p: Point): Option[Action] = {
-    def getAction(target: Point, actions: List[Action]): Option[Action] = {
+    def getAction(target: Point, actions: List[ActionOption]): Option[Action] = {
       actions match {
-        case action :: xs => if (action.canAct(target)) Some(action) else getAction(target, xs)
+        case actionOption :: xs => {
+          actionOption.getAction(target) match {
+            case None => getAction(target, xs)
+            case action => action
+          }
+        }
         case Nil => None
       }
     }
-    getAction(p, actions)
+    getAction(p, actionOptions)
+  }
+
+  def getActionState(action: Action): ActionState = {
+    action match {
+      case move: MoveAction => new MoveState(move)
+      case attack: AttackAction => new AttackState(attack)
+      case _ => ???
+    }
   }
 
   class InputAction extends ActionState {
     import InputAction._
 
-    override def target(p: Point): Unit = {
-      for( action <- getAction(p) ) {
-        action match {
-          case move: MoveAction => changeState(new MoveState(world.player, p))
-          case attack: AttackAction =>
-            attack.act(p)
-            changeState(new AttackState(world.player, p))
-        }
-        actionsLeft -= 1
+    override def target(target: Point): Unit = {
+      for(action <- getAction(target)) {
+        changeState(getActionState(action))
       }
     }
 
@@ -136,7 +151,7 @@ class CombatTracker(val world: World) extends StateMachine  {
     def renderValidPath(screen: Screen): Unit = {
       for (m <- mouse) {
         getAction(m) match {
-          case Some(action: MoveAction) => renderPath(screen, m)
+          case Some(move: MoveAction) => renderPath(screen, m)
           case _ =>
         }
       }
@@ -159,7 +174,6 @@ class CombatTracker(val world: World) extends StateMachine  {
     def renderPath(screen: Screen, target: Point): Unit = {
       val move = world.player.move
       val p0 = world.player.position
-
 
       val moves = pathFinder.moveCount(target, p0, move)
       if ((moves > 0) && (moves <= move)) {
@@ -197,25 +211,28 @@ class CombatTracker(val world: World) extends StateMachine  {
     }
   }
 
-  class MoveState(val agent: Agent, val p: Point) extends ActionState {
-    val p0 = agent.position
-    val path = pathFinder.path(p, p0)
+  class MoveState(val action: MoveAction) extends ActionState {
+    val p0 = action.entity.position
+    val path = pathFinder.path(action.target, p0)
     var smoothPath = smoothPathPoints(p0, path, Nil)
 
     def update(elapsed: Int): Unit = {
       smoothPath match {
         case x::xs =>
-          agent.position = x
+          action.entity.position = x
           smoothPath = xs
-        case Nil => changeState(nextAction())
+        case Nil => {
+          action.complete()
+          complete(this)
+        }
       }
     }
 
     def render(screen: Screen): Unit = {}
   }
 
-  class AttackState(val agent: Agent, val p: Point) extends ActionState {
-    var path = lineOfSight(p, agent.position).toList
+  class AttackState(val action: AttackAction) extends ActionState {
+    var path = lineOfSight(action.defender.position, action.attacker.position).toList
 
     var time = 0
     val rate = 300
@@ -227,7 +244,10 @@ class CombatTracker(val world: World) extends StateMachine  {
           time -= rate
           path = ps
         }
-        case Nil => changeState(nextAction())
+        case Nil => {
+          action.complete()
+          complete(this)
+        }
       }
     }
 
@@ -239,14 +259,21 @@ class CombatTracker(val world: World) extends StateMachine  {
     }
   }
 
-  class WaitState extends ActionState {
-    def update(elapsed: Int): Unit = {}
-    def render(screen: Screen): Unit = {}
-  }
-
   class CompositeActionState(val actions: Seq[ActionState]) extends ActionState {
-    def update(elapsed: Int): Unit = actions.foreach(_.update(elapsed))
-    def render(screen: Screen): Unit = actions.foreach(_.render(screen))
+    val actionsBuffer = actions.to[ListBuffer]
+
+    def update(elapsed: Int): Unit = {
+      actionsBuffer.foreach(_.update(elapsed))
+      if (actionsBuffer == Nil) {
+        endRound()
+        changeState(nextAction())
+      }
+    }
+    def render(screen: Screen): Unit = actionsBuffer.foreach(_.render(screen))
+
+    override def handleComplete(state: ActionState): Unit = {
+      actionsBuffer -= state
+    }
   }
 }
 
@@ -256,6 +283,7 @@ object InputAction {
   val moveChar = ScreenChar('.', RGB(61, 61, 61), Black)
   val pathChar = ScreenChar('.', White, Black)
 }
+
 
 
 object Line {

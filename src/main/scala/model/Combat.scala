@@ -38,7 +38,7 @@ object Combat {
 
   def attack(attackType: Combat, defender: Entity, resolution: (Combat, Int) => Int = attack): Unit = {
     val damage = resolution(attackType, defender.defense)
-    defender.takeDamage(damage)
+    defender.hp -= damage
   }
 }
 

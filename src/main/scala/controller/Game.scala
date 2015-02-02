@@ -80,7 +80,7 @@ trait Game { self: Controller =>
       strText.setText(stats.str)
       dexText.setText(stats.dex)
       intText.setText(stats.int)
-      actionsText.setText(tracker.actionsLeft)
+      actionsText.setText(tracker.player.ap)
       hpText.setText(hp)
 
       // TODO: update and render at different rates
@@ -109,7 +109,8 @@ trait Game { self: Controller =>
         infoPosText.setText(p)
         tracker.mouse = Some(p)
 
-        tracker.getAction(p) match {
+        val actionOpt = tracker.getAction(p)
+        actionOpt match {
           case Some(action) => infoDescText.setText(action.name)
           case None => infoDescText.setText("")
         }

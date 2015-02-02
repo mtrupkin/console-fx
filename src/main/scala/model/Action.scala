@@ -8,38 +8,49 @@ import me.mtrupkin.pathfinding.{Dijkstra}
  */
 trait Action {
   def name: String
-  def canAct(target: Point): Boolean
 }
 
-class MoveAction(val tracker: CombatTracker, val name: String = "Move") extends Action {
+case class MoveAction(entity: Entity, target: Point, name: String = "Move") extends Action {
+  def complete(): Unit =  {
+    entity.ap -= 1
+  }
+}
+
+case class AttackAction(attacker: Entity, defender: Entity, name: String = "Attack") extends Action {
+  def complete(): Unit =  {
+    attacker.ap -= 1
+    Combat.attack(attacker.melee, defender, Combat.playerAttack)
+  }
+}
+
+trait ActionOption {
+  def getAction(target: Point): Option[Action]
+}
+
+class MoveOption(val tracker: CombatTracker, val name: String = "Move") extends ActionOption {
   import tracker._
 
-  def canAct(target: Point): Boolean = {
+  def getAction(target: Point): Option[Action] = {
     val move = player.move
     val moves = tracker.pathFinder.moveCount(target, player.position, move)
     val path = tracker.pathFinder.path(target, player.position)
     if ((moves > 0) && (moves <= move) && (path != Nil) && agents.forall(_.position != target))
-      true
-    else false
+      Some(new MoveAction(tracker.world.player, target))
+    else None
   }
 }
 
-class AttackAction(val tracker: CombatTracker, val name: String = "Attack") extends Action {
+
+class AttackOption(val tracker: CombatTracker, val name: String = "Attack") extends ActionOption {
   import tracker._
 
-  def act(target: Point): Unit =  {
-    for {
-      a <- agents.find(a => a.position == target)
-    } Combat.attack(player.melee, a, Combat.playerAttack)
-  }
-
-  def canAct(target: Point): Boolean = {
+  def getAction(target: Point): Option[Action] = {
     for {
       a <- agents.find(a => a.position == target)
     } {
-      val lineOfSight = tracker.lineOfSight(a.position, player.position)
-      return (lineOfSight != Nil)
+      val los = lineOfSight(a.position, player.position)
+      if (los != Nil) return Some(new AttackAction(tracker.world.player, a))
     }
-    false
+    None
   }
 }

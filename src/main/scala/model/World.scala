@@ -14,7 +14,7 @@ import rexpaint.RexPaintImage
  */
 class World (
   val agents: Seq[Agent],
-  val player: Agent,
+  val player: Player,
   var tileMap: TileMap,
   var time: Long = 0)  {
 
@@ -28,18 +28,19 @@ class World (
     renderAgent(screen, player)
   }
 
-  def renderAgent(screen: Screen, agent: Agent): Unit = screen.write(agent.position, agent.sc)
+  def renderAgent(screen: Screen, agent: Entity): Unit = screen.write(agent.position, agent.sc)
 }
 
-case class AgentJS(name: String, position: Point, hp: Int)
-case class WorldJS(levelName: String, agents: Seq[AgentJS], player: AgentJS, time: Long)
+case class EntityJS(name: String, position: Point, hp: Int)
+
+case class WorldJS(levelName: String, agents: Seq[EntityJS], player: EntityJS, time: Long)
 
 object World {
   val saveDirectory = Paths.get("./save")
   val savePath = saveDirectory.resolve("game.json")
 
   import scala.collection.JavaConversions._
-  implicit val formatAgent = Json.format[AgentJS]
+  implicit val formatAgent = Json.format[EntityJS]
   implicit val formatWorld = Json.format[WorldJS]
 
   def read(): World = {
@@ -47,11 +48,11 @@ object World {
     val json = Json.parse(is)
     val worldJS = Json.fromJson[WorldJS](json).get
     val tileMap = TileMap.load(worldJS.levelName)
-    new World(worldJS.agents.map(toAgent(_)), toAgent(worldJS.player), tileMap, worldJS.time)
+    new World(worldJS.agents.map(toAgent(_)), toPlayer(worldJS.player), tileMap, worldJS.time)
   }
 
   def write(world: World): Unit = {
-    val worldJS = WorldJS(world.tileMap.levelName, world.agents.map(toAgentJS(_)), toAgentJS(world.player), world.time)
+    val worldJS = WorldJS(world.tileMap.levelName, world.agents.map(toAgentJS(_)), toPlayerJS(world.player), world.time)
     val json = Json.toJson(worldJS)
 
     Files.write(savePath, Seq(Json.prettyPrint(json)), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
@@ -61,18 +62,22 @@ object World {
 
   def delete(): Unit = Files.delete(savePath)
 
-  protected def toAgentJS(agent: Agent): AgentJS = {
-    AgentJS(agent.name, agent.position, agent.hp)
+  protected def toAgentJS(agent: Agent): EntityJS = {
+    EntityJS(agent.name, agent.position, agent.hp)
   }
 
-  protected def toAgent(agentJS: AgentJS): Agent = {
+  protected def toAgent(agentJS: EntityJS): Agent = {
     agentJS.name match {
-      case "Turret" => new Agent (agentJS.name, 'T', agentJS.position, currentHP = Some(agentJS.hp) ) {
-        def act (tracker: CombatTracker): Unit = tracker.attack (this, tracker.world.player) //Combat.attack(ranged, world.player)
-      }
-      case _ =>  new Agent(agentJS.name, '@', agentJS.position, Stats(str = 1), Some(agentJS.hp)) {
-        def act(tracker: CombatTracker): Unit = ???
-      }
+      case "Turret" => new Agent (agentJS.name, 'T', agentJS.position, currentHP = Some(agentJS.hp) )
+      case _ =>  ???
     }
+  }
+
+  protected def toPlayerJS(agent: Player): EntityJS = {
+    EntityJS(agent.name, agent.position, agent.hp)
+  }
+
+  protected def toPlayer(agentJS: EntityJS): Player = {
+    new Player(agentJS.name, '@', agentJS.position, currentHP = Some(agentJS.hp))
   }
 }

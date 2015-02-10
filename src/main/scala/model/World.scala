@@ -55,6 +55,7 @@ object World {
     val worldJS = WorldJS(world.tileMap.levelName, world.agents.map(toAgentJS(_)), toPlayerJS(world.player), world.time)
     val json = Json.toJson(worldJS)
 
+    Files.createDirectories(saveDirectory)
     Files.write(savePath, Seq(Json.prettyPrint(json)), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
   }
 

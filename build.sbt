@@ -22,3 +22,17 @@ libraryDependencies += "org.scalafx" %% "scalafxml-core-sfx8" % "0.2.2"
 
 libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.3.2"
 
+jreHome := (target in buildLauncher).value / "jre"
+
+lazy val extractJRE = TaskKey[File]("extract-jre", "Extract embedded JRE")
+
+extractJRE := {
+  val launcherHome = (target in buildLauncher).value
+  launcherHome.mkdirs()
+  val jreZip = sourceDirectory.value / "build" / "windows" / "jre.zip"
+  IO.unzip(jreZip, launcherHome)
+  jreHome.value
+}
+
+buildLauncher <<= buildLauncher.dependsOn(extractJRE)
+

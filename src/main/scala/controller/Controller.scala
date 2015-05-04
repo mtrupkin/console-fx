@@ -15,14 +15,11 @@ import scalafx.animation.AnimationTimer
  * Created by mtrupkin on 12/15/2014.
  */
 
-trait Controller extends StateMachine
-  with Intro
-  with Outro
-  with Game {
+trait Controller extends StateMachine {
   type StateType = ControllerState
 
   def stage: Stage
-  def css: String
+  val css: String = "/views/Console.css"
 
   val viewStack = new StackPane()
   viewStack.getChildren.add(new Label("Loading"))

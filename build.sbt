@@ -1,38 +1,28 @@
+import bintray.Keys._
+
 name := """console-fx"""
 
-version := "1.0"
+scalaVersion := "2.11.6"
 
-scalaVersion := "2.11.5"
+organization := "me.mtrupkin.console"
+
+licenses += ("MIT", url("http://www.opensource.org/licenses/mit-license.html"))
 
 resolvers ++= Seq(
 	Resolver.url("me.mtrupkin ivy repo", url("http://dl.bintray.com/mtrupkin/ivy/"))(Resolver.ivyStylePatterns)
 )
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.6" % "test"
+libraryDependencies ++= Seq(
+  "me.mtrupkin.console" %% "console-core" % "0.8-snapshot",
+  "org.scalafx" %% "scalafx" % "8.0.20-R6",
+  "org.scalafx" %% "scalafxml-core-sfx8" % "0.2.2")
 
-libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.0-M2"
+bintraySettings
 
-libraryDependencies += "me.mtrupkin.console" %% "console-core" % "0.7-SNAPSHOT"
+releaseSettings
 
-libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.20-R6"
+publishMavenStyle := false
 
-addCompilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+repository in bintray := "ivy"
 
-libraryDependencies += "org.scalafx" %% "scalafxml-core-sfx8" % "0.2.2"
-
-libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.3.2"
-
-jreHome := (target in buildLauncher).value / "jre"
-
-lazy val extractJRE = TaskKey[File]("extract-jre", "Extract embedded JRE")
-
-extractJRE := {
-  val launcherHome = (target in buildLauncher).value
-  launcherHome.mkdirs()
-  val jreZip = sourceDirectory.value / "build" / "windows" / "jre.zip"
-  IO.unzip(jreZip, launcherHome)
-  jreHome.value
-}
-
-buildLauncher <<= buildLauncher.dependsOn(extractJRE)
-
+bintrayOrganization in bintray := None

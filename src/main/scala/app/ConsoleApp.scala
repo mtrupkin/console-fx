@@ -1,32 +1,37 @@
 package me.mtrupkin.game.app
 
-import java.nio.file.{Paths, Files}
 import javafx.application.Application
 import javafx.scene.image.Image
 import javafx.stage.Stage
+
 import me.mtrupkin.controller.Controller
-import me.mtrupkin.game.model.Simulator
+import sample.TestController
+
 import scala.collection.JavaConversions._
 
-class ConsoleApp extends Application {
+abstract class ConsoleAppBase extends Application {
+  def title: String
+  def controller(primaryStage: Stage): Controller
+
   override def start(primaryStage: Stage) {
-    primaryStage.setTitle("Danger Room")
+    primaryStage.setTitle(title)
 
-    val rs = List("/icons/icon-16.png", "/icons/icon-32.png", "/icons/icon-64.png")
-    primaryStage.getIcons.addAll(rs.map(new Image(_)))
+    val rs = List("icon-16", "icon-32", "icon-64")
+    val icons = for(s <- rs) yield new Image(s"/icons/$s.png")
+    primaryStage.getIcons.addAll(icons)
 
-    object Controller extends Controller {
-      lazy val css = "/views/Console.css"
-      lazy val initialState: ControllerState = new IntroController
-      lazy val stage = primaryStage
-    }
+    controller(primaryStage).stage.show()
+  }
+}
 
-    Controller.stage.show()
+class ConsoleApp extends ConsoleAppBase {
+  val title = "Console App"
+
+  def controller(primaryStage: Stage) = new TestController {
+    lazy val initialState: ControllerState = new IntroController
+    lazy val stage = primaryStage
   }
 
-  def icons(rs: Seq[String]): Seq[Image] = {
-    rs.map(r => new Image(r))
-  }
 }
 
 object ConsoleApp extends App {

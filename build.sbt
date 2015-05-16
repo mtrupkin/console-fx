@@ -13,7 +13,7 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "me.mtrupkin.console" %% "console-core" % "0.8-snapshot",
+  "me.mtrupkin.console" %% "console-core" % "0.8-SNAPSHOT",
   "org.scalafx" %% "scalafx" % "8.0.20-R6",
   "org.scalafx" %% "scalafxml-core-sfx8" % "0.2.2")
 

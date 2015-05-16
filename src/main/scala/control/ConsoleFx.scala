@@ -14,12 +14,12 @@ import scala.Array._
 /**
  * Created by mtrupkin on 12/13/2014.
  */
-class ConsoleFx(val size: Size) extends Pane {
+class ConsoleFx(val size: Size, val fontSize: Int = 21) extends Pane {
   setStyle("-fx-background-color: black;")
   val offsetX, offsetY = 1
 
 
-  val charBounds = ConsoleFx.charBounds(ConsoleFx.font)
+  val charBounds = ConsoleFx.charBounds(ConsoleFx.font(fontSize))
   val stacks = new Matrix[StackPane](size)
   val labels = new Matrix[Label](size)
   val (conWidth, conHeight) = toPixel(Point(size.width, size.height))
@@ -78,7 +78,7 @@ class ConsoleFx(val size: Size) extends Pane {
 }
 
 object ConsoleFx {
-  val font = Font.font("Consolas", FontWeight.NORMAL, 21)
+  val font(fontSize: Int) = Font.font("Consolas", FontWeight.NORMAL, fontSize)
 
   def charBounds(f: Font): (Double, Double) = {
     val fl = com.sun.javafx.tk.Toolkit.getToolkit.getFontLoader
